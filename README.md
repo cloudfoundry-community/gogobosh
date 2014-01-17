@@ -12,6 +12,36 @@ Trying to write a client library for an API without any versioning strategy coul
 
 If you are using this library, or the Ruby library within the `bosh_cli` rubygem, or talking directly with the BOSH director API - please announce yourself on the bosh-users google group and/or to the PM of BOSH. This way they can be aware of who many be affected by API changes.
 
+## Install
+
+```
+go get github.com/cloudfoundry-community/gogobosh
+````
+
+### Use
+
+``` golang
+package main
+
+import (
+    bosh "github.com/cloudfoundry-community/gogobosh"
+)
+
+func main() {
+    director := bosh.New("https://192.168.50.4:25555", "admin", "admin")
+    fmt.Println("Director")
+    fmt.Printf("  Name       %s", director.Name)
+    fmt.Printf("  URL        %s", director.URL)
+    fmt.Printf("  Version    %s", director.Version)
+    fmt.Printf("  User       %s", director.User)
+    fmt.Printf("  UUID       %s", director.UUID)
+    fmt.Printf("  CPI        %s", director.CPI)
+    fmt.Printf("  dns        %s", director.DNSEnabled)
+    fmt.Printf("  compiled_package_cache %s (provider: %s)", director.CompiledPackageCacheEnabled, director.CompiledPackageCacheProvider)
+    fmt.Printf("  snapshots  %s", director.SnapshotsEnabled)
+}
+```
+
 ## Tests
 
 The integration tests assume that bosh-lite is running locally.
