@@ -15,6 +15,6 @@ func main() {
 	fmt.Printf("  UUID       %s\n", director.UUID)
 	fmt.Printf("  CPI        %s\n", director.CPI)
 	fmt.Printf("  dns        %s\n", director.DNSEnabled)
-	fmt.Printf("  compiled_package_cache %s (provider: %s)\n", director.CompiledPackageCacheEnabled, director.CompiledPackageCacheProvider)
-	fmt.Printf("  snapshots  %s\n", director.SnapshotsEnabled)
+	fmt.Printf("  compiled_package_cache %#v (provider: %s)\n", director.CompiledPackageCacheEnabled, director.CompiledPackageCacheProvider)
+	fmt.Printf("  snapshots  %#v\n", director.SnapshotsEnabled)
 }
