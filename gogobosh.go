@@ -29,7 +29,7 @@ type GetStatusResponse struct {
 }
 
 type getStatusFeaturesResponse struct {
-	Dns getStatusFeaturesDNS                                   `json:"dns"`
+	DNS getStatusFeaturesDNS                                   `json:"dns"`
 	CompiledPackageCache getStatusFeaturesCompiledPackageCache `json:"compiled_package_cache"`
 	Snapshots getStatusFeaturesSnapshots                       `json:"snapshots"`
 }
