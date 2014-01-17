@@ -14,6 +14,7 @@ type Director struct {
 	UUID string
 	CPI string
 	DNSEnabled bool
+	DNSDomainName string
 	CompiledPackageCacheEnabled bool
 	CompiledPackageCacheProvider string
 	SnapshotsEnabled bool
@@ -57,14 +58,20 @@ type getStatusFeaturesSnapshots struct {
 }
 
 func (resource GetStatusResponse) ToModel() (director Director) {
-/*	director.ApplicationFields = resource.ToFields()
-	routes := []cf.RouteSummary{}
-	for _, route := range resource.Routes {
-		routes = append(routes, route.ToModel())
-	}
-	app.RouteSummaries = routes
+	director = Director{}
+	director.Name = resource.Name
+	director.Version = resource.Version
+	director.User = resource.User
+	director.UUID = resource.UUID
+	director.CPI = resource.CPI
 
-*/	return
+	director.DNSEnabled = resource.Features.DNS.Status
+	director.DNSDomainName = resource.Features.DNS.Extras.DomainName
+	director.CompiledPackageCacheEnabled = resource.Features.CompiledPackageCache.Status
+	director.CompiledPackageCacheProvider = resource.Features.CompiledPackageCache.Extras.Provider
+	director.SnapshotsEnabled = resource.Features.Snapshots.Status
+	
+	return
 }
 
 func NewDirector(targetURL string, username string, password string) (director Director) {
