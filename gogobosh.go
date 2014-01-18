@@ -20,6 +20,11 @@ type Director struct {
 	SnapshotsEnabled bool
 }
 
+type VMStatus struct {
+	JobName string `json:"job"`
+	Index int      `json:"index"`
+}
+
 func NewDirector(targetURL string, username string, password string) (director Director) {
 	config := DirectorConfig{}
 	config.targetURL = targetURL

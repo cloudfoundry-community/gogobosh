@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestGamble(t *testing.T) {
+func TestGoGoBosh(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "GoGoBOSH suite")
 }

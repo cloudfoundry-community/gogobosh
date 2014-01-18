@@ -50,6 +50,6 @@ func (resource GetStatusResponse) ToModel() (director Director) {
 	director.CompiledPackageCacheEnabled = resource.Features.CompiledPackageCache.Status
 	director.CompiledPackageCacheProvider = resource.Features.CompiledPackageCache.Extras.Provider
 	director.SnapshotsEnabled = resource.Features.Snapshots.Status
-	
+
 	return
 }
