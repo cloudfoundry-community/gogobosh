@@ -21,8 +21,12 @@ type Director struct {
 }
 
 type VMStatus struct {
-	JobName string `json:"job"`
-	Index int      `json:"index"`
+	JobName string
+	Index int
+	JobState string
+    VMCid string
+    AgentID string
+    ResourcePool string
 }
 
 func NewDirector(targetURL string, username string, password string) (director Director) {
