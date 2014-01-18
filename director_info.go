@@ -1,43 +1,43 @@
 package gogobosh
 
-type GetStatusResponse struct {
+type DirectorInfoResponse struct {
 	Name string          `json:"name"`
 	UUID string          `json:"uuid"`
 	Version string       `json:"version"`
 	User string          `json:"user"`
 	CPI string           `json:"cpi"`
-	Features getStatusFeaturesResponse `json:"features"`
+	Features directorInfoFeaturesResponse `json:"features"`
 }
 
-type getStatusFeaturesResponse struct {
-	DNS getStatusFeaturesDNS                                   `json:"dns"`
-	CompiledPackageCache getStatusFeaturesCompiledPackageCache `json:"compiled_package_cache"`
-	Snapshots getStatusFeaturesSnapshots                       `json:"snapshots"`
+type directorInfoFeaturesResponse struct {
+	DNS directorInfoFeaturesDNS                                   `json:"dns"`
+	CompiledPackageCache directorInfoFeaturesCompiledPackageCache `json:"compiled_package_cache"`
+	Snapshots directorInfoFeaturesSnapshots                       `json:"snapshots"`
 }
 
-type getStatusFeaturesDNS struct {
+type directorInfoFeaturesDNS struct {
 	Status bool                       `json:"status"`
-	Extras getStatusFeaturesDNSExtras `json:"extras"`
+	Extras directorInfoFeaturesDNSExtras `json:"extras"`
 }
 
-type getStatusFeaturesDNSExtras struct {
+type directorInfoFeaturesDNSExtras struct {
 	DomainName string `json:"domain_name"`
 }
 
-type getStatusFeaturesCompiledPackageCache struct {
+type directorInfoFeaturesCompiledPackageCache struct {
 	Status bool                                        `json:"status"`
-	Extras getStatusFeaturesCompiledPackageCacheExtras `json:"extras"`
+	Extras directorInfoFeaturesCompiledPackageCacheExtras `json:"extras"`
 }
 
-type getStatusFeaturesCompiledPackageCacheExtras struct {
+type directorInfoFeaturesCompiledPackageCacheExtras struct {
 	Provider string `json:"provider"`
 }
 
-type getStatusFeaturesSnapshots struct {
+type directorInfoFeaturesSnapshots struct {
 	Status bool `json:"status"`
 }
 
-func (resource GetStatusResponse) ToModel() (director Director) {
+func (resource DirectorInfoResponse) ToModel() (director Director) {
 	director = Director{}
 	director.Name = resource.Name
 	director.Version = resource.Version

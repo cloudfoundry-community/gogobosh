@@ -7,7 +7,13 @@ import (
 	"encoding/json"
 )
 
-var _ = Describe("get status", func() {
+var _ = Describe("get director info", func() {
+	/*
+	 * To get the director info:
+	 *   curl -v -k -u admin:admin https://192.168.50.4:25555/info
+	 *
+	 * This will give one of the responseJSON items per VM:
+	*/
 	It("returns Director", func() {
 		responseJSON := `{
 		  "name": "Bosh Lite Director",
@@ -33,7 +39,7 @@ var _ = Describe("get status", func() {
 		    }
 		  }
 		}`
-		resource := new(gogobosh.GetStatusResponse)
+		resource := new(gogobosh.DirectorInfoResponse)
 		b := []byte(responseJSON)
 		err := json.Unmarshal(b, &resource)
 		Expect(err).NotTo(HaveOccurred())
