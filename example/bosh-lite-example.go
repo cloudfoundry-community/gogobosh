@@ -19,6 +19,11 @@ func main() {
 	} else {
 		fmt.Printf("  dns        %#v\n", director.DNSEnabled)
 	}
-	fmt.Printf("  compiled_package_cache %#v (provider: %s)\n", director.CompiledPackageCacheEnabled, director.CompiledPackageCacheProvider)
+	if director.CompiledPackageCacheEnabled {
+		fmt.Printf("  compiled_package_cache %#v (provider: %s)\n", director.CompiledPackageCacheEnabled, director.CompiledPackageCacheProvider)
+	} else {
+		fmt.Printf("  compiled_package_cache %#v\n", director.CompiledPackageCacheEnabled)
+	}
+	
 	fmt.Printf("  snapshots  %#v\n", director.SnapshotsEnabled)
 }
