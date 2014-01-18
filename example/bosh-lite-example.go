@@ -7,23 +7,24 @@ import (
 
 func main() {
 	director := gogobosh.NewDirector("https://192.168.50.4:25555", "admin", "admin")
+	info := director.GetInfo()
 	fmt.Println("Director")
-	fmt.Printf("  Name       %s\n", director.Name)
-	fmt.Printf("  URL        %s\n", director.URL)
-	fmt.Printf("  Version    %s\n", director.Version)
-	fmt.Printf("  User       %s\n", director.User)
-	fmt.Printf("  UUID       %s\n", director.UUID)
-	fmt.Printf("  CPI        %s\n", director.CPI)
-	if director.DNSEnabled {
-		fmt.Printf("  dns        %#v (%s)\n", director.DNSEnabled, director.DNSDomainName)
+	fmt.Printf("  Name       %s\n", info.Name)
+	fmt.Printf("  URL        %s\n", info.URL)
+	fmt.Printf("  Version    %s\n", info.Version)
+	fmt.Printf("  User       %s\n", info.User)
+	fmt.Printf("  UUID       %s\n", info.UUID)
+	fmt.Printf("  CPI        %s\n", info.CPI)
+	if info.DNSEnabled {
+		fmt.Printf("  dns        %#v (%s)\n", info.DNSEnabled, info.DNSDomainName)
 	} else {
-		fmt.Printf("  dns        %#v\n", director.DNSEnabled)
+		fmt.Printf("  dns        %#v\n", info.DNSEnabled)
 	}
-	if director.CompiledPackageCacheEnabled {
-		fmt.Printf("  compiled_package_cache %#v (provider: %s)\n", director.CompiledPackageCacheEnabled, director.CompiledPackageCacheProvider)
+	if info.CompiledPackageCacheEnabled {
+		fmt.Printf("  compiled_package_cache %#v (provider: %s)\n", info.CompiledPackageCacheEnabled, info.CompiledPackageCacheProvider)
 	} else {
-		fmt.Printf("  compiled_package_cache %#v\n", director.CompiledPackageCacheEnabled)
+		fmt.Printf("  compiled_package_cache %#v\n", info.CompiledPackageCacheEnabled)
 	}
 	
-	fmt.Printf("  snapshots  %#v\n", director.SnapshotsEnabled)
+	fmt.Printf("  snapshots  %#v\n", info.SnapshotsEnabled)
 }

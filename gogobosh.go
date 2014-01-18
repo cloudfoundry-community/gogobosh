@@ -79,11 +79,16 @@ type VMStatus struct {
 }
 
 func NewDirector(targetURL string, username string, password string) (director Director) {
-	config := Director{}
-	config.targetURL = targetURL
-	config.username = username
-	config.password = password
+	director = Director{}
+	director.targetURL = targetURL
+	director.username = username
+	director.password = password
 	
 	return
 }
 
+func (director Director) GetInfo() (info DirectorInfo) {
+	info = DirectorInfo{}
+	info.Name = "hi"
+	return
+}
