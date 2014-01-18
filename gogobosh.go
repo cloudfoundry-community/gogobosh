@@ -1,12 +1,12 @@
 package gogobosh
 
-type DirectorConfig struct {
+type Director struct {
 	targetURL string
 	username  string
 	password  string
 }
 
-type Director struct {
+type DirectorInfo struct {
 	Name string
 	URL string
 	Version string
@@ -79,12 +79,11 @@ type VMStatus struct {
 }
 
 func NewDirector(targetURL string, username string, password string) (director Director) {
-	config := DirectorConfig{}
+	config := Director{}
 	config.targetURL = targetURL
 	config.username = username
 	config.password = password
 	
-	director = Director{}
-	
 	return
 }
+

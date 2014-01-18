@@ -37,8 +37,8 @@ type directorInfoFeaturesSnapshots struct {
 	Status bool `json:"status"`
 }
 
-func (resource DirectorInfoResponse) ToModel() (director Director) {
-	director = Director{}
+func (resource DirectorInfoResponse) ToModel() (director DirectorInfo) {
+	director = DirectorInfo{}
 	director.Name = resource.Name
 	director.Version = resource.Version
 	director.User = resource.User
