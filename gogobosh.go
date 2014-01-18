@@ -20,6 +20,12 @@ type Director struct {
 	SnapshotsEnabled bool
 }
 
+type Stemcell struct {
+	Name string
+	Version string
+	Cid string
+}
+
 type VMStatus struct {
 	JobName string
 	Index int
