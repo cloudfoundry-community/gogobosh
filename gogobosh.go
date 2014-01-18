@@ -27,6 +27,7 @@ type VMStatus struct {
 	VMCid string
 	AgentID string
 	ResourcePool string
+	ResurrectionPaused bool
 	IPs []string
 	DNSs []string
 }
