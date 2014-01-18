@@ -8,5 +8,5 @@ import (
 
 func TestGamble(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Gamble Suite")
+	RunSpecs(t, "GoGoBOSH suite")
 }
