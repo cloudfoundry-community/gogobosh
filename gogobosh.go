@@ -30,6 +30,14 @@ type VMStatus struct {
 	ResurrectionPaused bool
 	IPs []string
 	DNSs []string
+	CPUUser float64
+	CPUSys float64
+	CPUWait float64
+	MemoryPercent float64
+	MemoryKb int
+	SwapPercent float64
+	SwapKb int
+	DiskPersistentPercent float64
 }
 
 func NewDirector(targetURL string, username string, password string) (director Director) {

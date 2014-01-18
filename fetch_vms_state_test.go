@@ -28,7 +28,7 @@ var _ = Describe("parse full vms task output", func() {
             "10.244.0.38"
           ],
           "dns": [
-            "0.etcd_leader_z1.default.my-deployment.bosh"
+            "0.etcd-leader-z1.default.my-deployment.bosh"
           ],
           "vitals": {
             "load": [
@@ -50,9 +50,6 @@ var _ = Describe("parse full vms task output", func() {
               "kb": "284"
             },
             "disk": {
-              "system": {
-                "percent": null
-              },
               "persistent": {
                 "percent": "1"
               }
@@ -80,8 +77,15 @@ var _ = Describe("parse full vms task output", func() {
 		Expect(vm_status.IPs[0]).To(Equal("10.244.0.38"))
 
 		Expect(len(vm_status.DNSs)).To(Equal(1))
-		Expect(vm_status.DNSs[0]).To(Equal("0.etcd_leader_z1.default.my-deployment.bosh"))
+		Expect(vm_status.DNSs[0]).To(Equal("0.etcd-leader-z1.default.my-deployment.bosh"))
 
-		
+		Expect(vm_status.CPUUser).To(Equal(0.2))
+		Expect(vm_status.CPUSys).To(Equal(1.5))
+		Expect(vm_status.CPUWait).To(Equal(0.0))
+		Expect(vm_status.MemoryPercent).To(Equal(43.1))
+		Expect(vm_status.MemoryKb).To(Equal(2635712))
+		Expect(vm_status.SwapPercent).To(Equal(0.0))
+		Expect(vm_status.SwapKb).To(Equal(284))
+		Expect(vm_status.DiskPersistentPercent).To(Equal(1.0))
 	})
 })
