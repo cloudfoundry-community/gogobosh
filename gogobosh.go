@@ -49,6 +49,15 @@ type NameVersion struct {
 	Version string
 }
 
+type TaskStatus struct {
+	ID int
+	State string
+	Description string
+	TimeStamp int
+	Result string
+	User string
+}
+
 type VMStatus struct {
 	JobName string
 	Index int

@@ -11,8 +11,6 @@ var _ = Describe("get list of stemcells", func() {
 	/*
 	 * To get the director info:
 	 *   curl -k -u admin:admin https://192.168.50.4:25555/stemcells
-	 *
-	 * This will give one of the responseJSON items per VM:
 	*/
 	It("returns []Stemcell", func() {
 		responseJSON := `[
@@ -42,7 +40,5 @@ var _ = Describe("get list of stemcells", func() {
 		Expect(stemcell.Name).To(Equal("bosh-stemcell"))
 		Expect(stemcell.Version).To(Equal("993"))
 		Expect(stemcell.Cid).To(Equal("stemcell-6e6b9689-8b03-42cd-a6de-7784e3c421ec"))
-
-		/* TODO: deployments is returning an internal Ruby object string; not JSON. */
 	})
 })
