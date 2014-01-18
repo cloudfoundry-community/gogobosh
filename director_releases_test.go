@@ -11,10 +11,8 @@ var _ = Describe("get list of releases", func() {
 	/*
 	 * To get the director info:
 	 *   curl -k -u admin:admin https://192.168.50.4:25555/releases
-	 *
-	 * This will give one of the responseJSON items per VM:
 	*/
-	It("returns Director", func() {
+	It("returns Release", func() {
 		responseJSON := `[
 		  {
 		    "name": "cf",

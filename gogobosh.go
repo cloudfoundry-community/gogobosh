@@ -38,6 +38,17 @@ type ReleaseVersion struct {
 	CurrentlyDeployed bool
 }
 
+type Deployment struct {
+	Name string
+	Releases []NameVersion
+	Stemcells []NameVersion
+}
+
+type NameVersion struct {
+	Name string
+	Version string
+}
+
 type VMStatus struct {
 	JobName string
 	Index int
