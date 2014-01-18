@@ -28,7 +28,7 @@ var _ = Describe("parse full vms task output", func() {
             "10.244.0.38"
           ],
           "dns": [
-        
+            "0.etcd_leader_z1.default.my-deployment.bosh"
           ],
           "vitals": {
             "load": [
@@ -74,5 +74,13 @@ var _ = Describe("parse full vms task output", func() {
 		Expect(vm_status.VMCid).To(Equal("vm-00b5c65f-d2f4-4289-ab8d-8ae413b4dc9b"))
 		Expect(vm_status.AgentID).To(Equal("892d2de8-16aa-4567-b49a-45b1d99882b5"))
 		Expect(vm_status.ResourcePool).To(Equal("medium_z1"))
+
+		Expect(len(vm_status.IPs)).To(Equal(1))
+		Expect(vm_status.IPs[0]).To(Equal("10.244.0.38"))
+
+		Expect(len(vm_status.DNSs)).To(Equal(1))
+		Expect(vm_status.DNSs[0]).To(Equal("0.etcd_leader_z1.default.my-deployment.bosh"))
+
+		
 	})
 })

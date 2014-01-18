@@ -24,9 +24,11 @@ type VMStatus struct {
 	JobName string
 	Index int
 	JobState string
-    VMCid string
-    AgentID string
-    ResourcePool string
+	VMCid string
+	AgentID string
+	ResourcePool string
+	IPs []string
+	DNSs []string
 }
 
 func NewDirector(targetURL string, username string, password string) (director Director) {
