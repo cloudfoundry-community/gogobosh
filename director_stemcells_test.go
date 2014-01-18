@@ -14,7 +14,7 @@ var _ = Describe("get list of stemcells", func() {
 	 *
 	 * This will give one of the responseJSON items per VM:
 	*/
-	It("returns Director", func() {
+	It("returns []Stemcell", func() {
 		responseJSON := `[
 		  {
 		    "name": "bosh-stemcell",

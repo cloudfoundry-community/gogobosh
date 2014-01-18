@@ -26,6 +26,18 @@ type Stemcell struct {
 	Cid string
 }
 
+type Release struct {
+	Name string
+	Versions []ReleaseVersion
+}
+
+type ReleaseVersion struct {
+	Version string
+	CommitHash string
+	UncommittedChanges bool
+	CurrentlyDeployed bool
+}
+
 type VMStatus struct {
 	JobName string
 	Index int
