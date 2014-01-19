@@ -38,4 +38,24 @@ func main() {
 	}
 	
 	fmt.Printf("  snapshots  %#v\n", info.SnapshotsEnabled)
+	fmt.Println("")
+
+	stemcells, apiResponse := repo.GetStemcells()
+	for _, stemcell := range stemcells {
+		fmt.Printf("%#v\n", stemcell)
+	}
+	fmt.Println("")
+
+	releases, apiResponse := repo.GetReleases()
+	for _, release := range releases {
+		fmt.Printf("%#v\n", release)
+	}
+	fmt.Println("")
+
+
+	deployments, apiResponse := repo.GetDeployments()
+	for _, deployment := range deployments {
+		fmt.Printf("%#v\n", deployment)
+	}
+	fmt.Println("")
 }

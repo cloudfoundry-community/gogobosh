@@ -1,5 +1,23 @@
 package gogobosh
 
+func (repo BoshDirectorRepository) GetReleases() (releases []Release, apiResponse ApiResponse) {
+	releasesResponse := []ReleaseResponse{}
+
+	path := "/releases"
+	username := "admin"
+	password := "admin"
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, username, password, &releasesResponse)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	for _, resource := range releasesResponse {
+		releases = append(releases, resource.ToModel())
+	}
+
+	return
+}
+
 type ReleaseResponse struct {
 	Name string                       `json:"name"`
 	Versions []releaseVersionResponse `json:"release_versions"`

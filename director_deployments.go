@@ -1,5 +1,23 @@
 package gogobosh
 
+func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, apiResponse ApiResponse) {
+	deploymentsResponse := []DeploymentResponse{}
+
+	path := "/deployments"
+	username := "admin"
+	password := "admin"
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, username, password, &deploymentsResponse)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	for _, resource := range deploymentsResponse {
+		deployments = append(deployments, resource.ToModel())
+	}
+
+	return
+}
+
 type DeploymentResponse struct {
 	Name string             `json:"name"`
 	Releases []nameVersion  `json:"deployments"`
