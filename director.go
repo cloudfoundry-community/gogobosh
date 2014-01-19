@@ -5,6 +5,7 @@ type DirectorRepository interface {
 	GetStemcells() (stemcells []Stemcell, apiResponse ApiResponse)
 	GetReleases() (releases []Release, apiResponse ApiResponse)
 	GetDeployments() (deployments []Deployment, apiResponse ApiResponse)
+	GetTaskStatus(taskID int) (task TaskStatus, apiResponse ApiResponse)
 }
 
 type BoshDirectorRepository struct {

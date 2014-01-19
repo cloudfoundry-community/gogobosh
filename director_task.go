@@ -1,5 +1,25 @@
 package gogobosh
 
+import (
+	"fmt"
+)
+
+func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task TaskStatus, apiResponse ApiResponse) {
+	taskResponse := TaskStatusResponse{}
+
+	path := fmt.Sprintf("/tasks/%d", taskID)
+	username := "admin"
+	password := "admin"
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, username, password, &taskResponse)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	task = taskResponse.ToModel()
+
+	return
+}
+
 type TaskStatusResponse struct {
 	ID int             `json:"id"`
 	State string       `json:"state"`

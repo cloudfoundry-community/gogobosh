@@ -73,4 +73,12 @@ func main() {
 		}
 		fmt.Println("")
 	}
+
+	task, apiResponse := repo.GetTaskStatus(1)
+	if apiResponse.IsNotSuccessful() {
+		fmt.Println("Could not fetch BOSH task 1")
+		return
+	} else {
+		fmt.Printf("%#v\n", task)
+	}
 }
