@@ -1,5 +1,21 @@
 package gogobosh
 
+func (repo BoshDirectorRepository) GetInfo() (directorInfo DirectorInfo, apiResponse ApiResponse) {
+	infoResource := new(DirectorInfoResponse)
+
+	path := "/info"
+	username := "admin"
+	password := "admin"
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, username, password, infoResource)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	directorInfo = infoResource.ToModel()
+
+	return
+}
+
 type DirectorInfoResponse struct {
 	Name string          `json:"name"`
 	UUID string          `json:"uuid"`

@@ -1,9 +1,12 @@
 package gogobosh
 
+const (
+	Version = "0.1.0"
+)
 type Director struct {
-	targetURL string
-	username  string
-	password  string
+	TargetURL string
+	Username  string
+	Password  string
 }
 
 type DirectorInfo struct {
@@ -80,9 +83,9 @@ type VMStatus struct {
 
 func NewDirector(targetURL string, username string, password string) (director Director) {
 	director = Director{}
-	director.targetURL = targetURL
-	director.username = username
-	director.password = password
+	director.TargetURL = targetURL
+	director.Username = username
+	director.Password = password
 	
 	return
 }

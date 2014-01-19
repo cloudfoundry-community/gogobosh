@@ -7,7 +7,18 @@ import (
 
 func main() {
 	director := gogobosh.NewDirector("https://192.168.50.4:25555", "admin", "admin")
-	info := director.GetInfo()
+/*	repoLocator := gogobosh.NewRepositoryLocator(&director, map[string]gogobosh.Gateway{
+		"bosh": gogobosh.NewDirectorGateway(),
+	})
+*/
+	repo := gogobosh.NewBoshDirectorRepository(&director, gogobosh.NewDirectorGateway())
+
+	info, apiResponse := repo.GetInfo()
+	if apiResponse.IsNotSuccessful() {
+		fmt.Println("Could not fetch BOSH info")
+		return
+	}
+
 	fmt.Println("Director")
 	fmt.Printf("  Name       %s\n", info.Name)
 	fmt.Printf("  URL        %s\n", info.URL)
