@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
+	gogobosh.Logger = gogobosh.NewLogger()
+
 	director := gogobosh.NewDirector("https://192.168.50.4:25555", "admin", "admin")
 /*	repoLocator := gogobosh.NewRepositoryLocator(&director, map[string]gogobosh.Gateway{
 		"bosh": gogobosh.NewDirectorGateway(),

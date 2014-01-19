@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const CF_TRACE = "CF_TRACE"
+const GOGOBOSH_TRACE = "GOGOBOSH_TRACE"
 
 type Printer interface {
 	Print(v ...interface{})
@@ -32,7 +32,7 @@ func SetStdout(s io.Writer) {
 }
 
 func NewLogger() Printer {
-	cf_trace := os.Getenv(CF_TRACE)
+	cf_trace := os.Getenv(GOGOBOSH_TRACE)
 	switch cf_trace {
 	case "", "false":
 		return new(nullLogger)
