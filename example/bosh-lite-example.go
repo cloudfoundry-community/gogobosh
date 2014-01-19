@@ -36,26 +36,41 @@ func main() {
 	} else {
 		fmt.Printf("  compiled_package_cache %#v\n", info.CompiledPackageCacheEnabled)
 	}
-	
 	fmt.Printf("  snapshots  %#v\n", info.SnapshotsEnabled)
+	fmt.Println("")
+	fmt.Printf("%#v\n", info)
 	fmt.Println("")
 
 	stemcells, apiResponse := repo.GetStemcells()
-	for _, stemcell := range stemcells {
-		fmt.Printf("%#v\n", stemcell)
+	if apiResponse.IsNotSuccessful() {
+		fmt.Println("Could not fetch BOSH stemcells")
+		return
+	} else {
+		for _, stemcell := range stemcells {
+			fmt.Printf("%#v\n", stemcell)
+		}
+		fmt.Println("")
 	}
-	fmt.Println("")
 
 	releases, apiResponse := repo.GetReleases()
-	for _, release := range releases {
-		fmt.Printf("%#v\n", release)
+	if apiResponse.IsNotSuccessful() {
+		fmt.Println("Could not fetch BOSH releases")
+		return
+	} else {
+		for _, release := range releases {
+			fmt.Printf("%#v\n", release)
+		}
+		fmt.Println("")
 	}
-	fmt.Println("")
-
 
 	deployments, apiResponse := repo.GetDeployments()
-	for _, deployment := range deployments {
-		fmt.Printf("%#v\n", deployment)
+	if apiResponse.IsNotSuccessful() {
+		fmt.Println("Could not fetch BOSH deployments")
+		return
+	} else {
+		for _, deployment := range deployments {
+			fmt.Printf("%#v\n", deployment)
+		}
+		fmt.Println("")
 	}
-	fmt.Println("")
 }
