@@ -26,7 +26,7 @@ var _ = Describe("parse full vms task output", func() {
 			Response: gogobosh.TestResponse{
 				Status: http.StatusOK,
 				Body: `{
-				  "id": 40,
+				  "id": 12,
 				  "state": "queued",
 				  "description": "retrieve vm-stats",
 				  "timestamp": 1390174354,
@@ -39,7 +39,7 @@ var _ = Describe("parse full vms task output", func() {
 			Response: gogobosh.TestResponse{
 				Status: http.StatusOK,
 				Body: `{
-				  "id": 40,
+				  "id": 12,
 				  "state": "done",
 				  "description": "retrieve vm-stats",
 				  "timestamp": 1390174354,

@@ -1,6 +1,9 @@
 package gogobosh
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsStatus []VMStatus, apiResponse ApiResponse) {
 	var taskStatus TaskStatus
@@ -16,6 +19,14 @@ func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsSta
 		return
 	}
 
+	for taskStatus.State != "done" {
+		time.Sleep(1)
+		taskStatus, apiResponse = repo.GetTaskStatus(taskStatus.ID)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
+		fmt.Printf("%#v\n", taskStatus)
+	}
 
 	return
 }
