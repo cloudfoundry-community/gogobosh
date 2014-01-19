@@ -81,4 +81,12 @@ func main() {
 	} else {
 		fmt.Printf("%#v\n", task)
 	}
+
+	vms_status, apiResponse := repo.GetVMsStatus("cf-warden")
+	if apiResponse.IsNotSuccessful() {
+		fmt.Println("Could not fetch VMs status for cf-warden")
+		return
+	} else {
+		fmt.Printf("%#v\n", vms_status)
+	}
 }
