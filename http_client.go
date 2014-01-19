@@ -32,7 +32,13 @@ func PrepareRedirect(req *http.Request, via []*http.Request) error {
 
 	prevReq := via[len(via)-1]
 
+	/* Ensure redirect includes original IP:PORT & Authorization */
+	req.URL.Host = prevReq.URL.Host
+	req.Host = prevReq.Host
 	req.Header.Set("Authorization", prevReq.Header.Get("Authorization"))
+	req.Header.Set("Accept", prevReq.Header.Get("Accept"))
+	req.Header.Set("Content-Type", prevReq.Header.Get("Content-Type"))
+	req.Header.Set("User-Agent", prevReq.Header.Get("User-Agent"))
 
 	dumpRequest(req)
 
