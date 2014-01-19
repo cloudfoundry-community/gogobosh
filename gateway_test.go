@@ -2,32 +2,20 @@ package gogobosh_test
 
 import (
 	gogobosh "github.com/cloudfoundry-community/gogobosh"
-	"github.com/stretchr/testify/assert"
-	"os"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"runtime"
-	"testing"
 )
 
-func TestNewRequest(t *testing.T) {
+var _ = Describe("Gateway", func() {
+	It("NewRequest successfully", func() {
+		gateway := gogobosh.NewDirectorGateway()
 
-	gateway := gogobosh.NewDirectorGateway()
+		request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "admin", "admin", nil)
 
-	request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "admin", "admin", nil)
-
-	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, request.HttpReq.Header.Get("Authorization"), "BEARER my-access-token")
-	assert.Equal(t, request.HttpReq.Header.Get("accept"), "application/json")
-	assert.Equal(t, request.HttpReq.Header.Get("User-Agent"), "gogobosh "+gogobosh.Version+" / "+runtime.GOOS)
-}
-
-func TestNewRequestWithAFileBody(t *testing.T) {
-
-	gateway := gogobosh.NewDirectorGateway()
-
-	body, err := os.Open("../../fixtures/hello_world.txt")
-	assert.NoError(t, err)
-	request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "admin", "admin", body)
-
-	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, request.HttpReq.ContentLength, 12)
-}
+		Expect(apiResponse.IsSuccessful()).To(Equal(true))
+		Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("Basic YWRtaW46YWRtaW4="))
+		Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
+		Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("gogobosh "+gogobosh.Version+" / "+runtime.GOOS))
+	})
+})
