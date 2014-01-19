@@ -1,5 +1,25 @@
 package gogobosh
 
+import "fmt"
+
+func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsStatus []VMStatus, apiResponse ApiResponse) {
+	var taskStatus TaskStatus
+
+	/*
+	* Two API calls
+	* 1. GET /deployments/%s/vms?format=full and be redirected to a /tasks/123
+	* 2. Streaming GET on /tasks/123/output?type=result - each line is a VMStatus
+	*/
+	path := fmt.Sprintf("/deployments/%s/vms?format=full", deploymentName)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &taskStatus)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+
+	return
+}
+
 type VMStatusResponse struct {
 	JobName string  `json:"job_name"`
 	Index int   `json:"index"`
