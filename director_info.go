@@ -1,12 +1,10 @@
 package gogobosh
 
 func (repo BoshDirectorRepository) GetInfo() (directorInfo DirectorInfo, apiResponse ApiResponse) {
-	infoResource := new(DirectorInfoResponse)
+	infoResource := DirectorInfoResponse{}
 
 	path := "/info"
-	username := "admin"
-	password := "admin"
-	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, username, password, infoResource)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &infoResource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

@@ -4,9 +4,7 @@ func (repo BoshDirectorRepository) GetStemcells() (stemcells []Stemcell, apiResp
 	stemcellsResponse := []StemcellResponse{}
 
 	path := "/stemcells"
-	username := "admin"
-	password := "admin"
-	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, username, password, &stemcellsResponse)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &stemcellsResponse)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

@@ -4,9 +4,7 @@ func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, a
 	deploymentsResponse := []DeploymentResponse{}
 
 	path := "/deployments"
-	username := "admin"
-	password := "admin"
-	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, username, password, &deploymentsResponse)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &deploymentsResponse)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

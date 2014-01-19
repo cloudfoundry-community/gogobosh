@@ -8,9 +8,7 @@ func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task TaskStatus, a
 	taskResponse := TaskStatusResponse{}
 
 	path := fmt.Sprintf("/tasks/%d", taskID)
-	username := "admin"
-	password := "admin"
-	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, username, password, &taskResponse)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &taskResponse)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

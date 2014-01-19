@@ -4,9 +4,7 @@ func (repo BoshDirectorRepository) GetReleases() (releases []Release, apiRespons
 	releasesResponse := []ReleaseResponse{}
 
 	path := "/releases"
-	username := "admin"
-	password := "admin"
-	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, username, password, &releasesResponse)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &releasesResponse)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
