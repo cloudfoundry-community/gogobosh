@@ -89,9 +89,3 @@ func NewDirector(targetURL string, username string, password string) (director D
 	
 	return
 }
-
-func (director Director) GetInfo() (info DirectorInfo) {
-	info = DirectorInfo{}
-	info.Name = "hi"
-	return
-}
