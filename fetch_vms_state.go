@@ -3,9 +3,11 @@ package gogobosh
 import (
 	"fmt"
 	"time"
+	"strings"
+	"encoding/json"
 )
 
-func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsStatus []VMStatus, apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsStatuses []VMStatus, apiResponse ApiResponse) {
 	var taskStatus TaskStatus
 
 	/*
@@ -25,7 +27,32 @@ func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsSta
 		if apiResponse.IsNotSuccessful() {
 			return
 		}
-		fmt.Printf("%#v\n", taskStatus)
+	}
+
+	path = fmt.Sprintf("/tasks/%d/output?type=result", taskStatus.ID)
+	request, apiResponse := repo.gateway.NewRequest("GET", repo.config.TargetURL+path, repo.config.Username, repo.config.Password, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	bytes, _, apiResponse := repo.gateway.PerformRequestForResponseBytes(request)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	if apiResponse.StatusCode > 203 {
+		return
+	}
+
+	for _, vmStatusResponse := range strings.Split(string(bytes), "\n") {
+		resource := VMStatusResponse{}
+		err := json.Unmarshal([]byte(vmStatusResponse), &resource)
+		if err != nil {
+/*			apiResponse = NewApiResponseWithError("Invalid JSON response from server", err)*/
+			return
+		}
+
+		vmsStatuses = append(vmsStatuses, resource.ToModel())
 	}
 
 	return
