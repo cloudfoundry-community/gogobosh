@@ -4,7 +4,10 @@ type DirectorRepository interface {
 	GetInfo() (directorInfo DirectorInfo, apiResponse ApiResponse)
 	GetStemcells() (stemcells []Stemcell, apiResponse ApiResponse)
 	GetReleases() (releases []Release, apiResponse ApiResponse)
+
 	GetDeployments() (deployments []Deployment, apiResponse ApiResponse)
+	DeleteDeployment(deploymentName string) (apiResponse ApiResponse)
+
 	GetTaskStatus(taskID int) (task TaskStatus, apiResponse ApiResponse)
 	ListDeploymentVMs(deploymentName string) (deploymentVMs []DeploymentVM, apiResponse ApiResponse)
 	FetchVMsStatus(deploymentName string) (vmsStatus []VMStatus, apiResponse ApiResponse)

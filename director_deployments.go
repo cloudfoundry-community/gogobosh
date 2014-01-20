@@ -1,5 +1,9 @@
 package gogobosh
 
+import (
+	"fmt"
+)
+
 func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, apiResponse ApiResponse) {
 	deploymentsResponse := []deploymentResponse{}
 
@@ -11,6 +15,16 @@ func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, a
 
 	for _, resource := range deploymentsResponse {
 		deployments = append(deployments, resource.ToModel())
+	}
+
+	return
+}
+
+func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiResponse ApiResponse) {
+	path := fmt.Sprintf("/deployments/%s?force=true", deploymentName)
+	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
+	if apiResponse.IsNotSuccessful() {
+		return
 	}
 
 	return

@@ -7,8 +7,8 @@ import (
 	"net/http"
 )
 
-var _ = Describe("get list of deployments", func() {
-	It("GET /deployments to return []DirectorDeployment{}", func() {
+var _ = Describe("Deployments", func() {
+	It("GetDeployments() - list of deployments", func() {
 		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
 			Method: "GET",
 			Path:   "/deployments",
@@ -46,6 +46,22 @@ var _ = Describe("get list of deployments", func() {
 		deployment_stemcell := deployment.Stemcells[0]
 		Expect(deployment_stemcell.Name).To(Equal("bosh-stemcell"))
 		Expect(deployment_stemcell.Version).To(Equal("993"))
+
+		Expect(apiResponse.IsSuccessful()).To(Equal(true))
+		Expect(handler.AllRequestsCalled()).To(Equal(true))
+	})
+
+	It("DeleteDeployment(name) forcefully", func() {
+		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+			Method: "DELETE",
+			Path:   "/deployments/cf-warden?force=true",
+			Response: gogobosh.TestResponse{
+				Status: http.StatusOK,
+			}})
+		ts, handler, repo := createDirectorRepo(request)
+		defer ts.Close()
+
+		apiResponse := repo.DeleteDeployment("cf-warden")
 
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
