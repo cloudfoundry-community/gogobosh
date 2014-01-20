@@ -88,6 +88,18 @@ func main() {
 
 	fmt.Println("")
 	fmt.Println("VMs in cf-warden deployment:")
+	vms, apiResponse := repo.ListVMs("cf-warden")
+	if apiResponse.IsNotSuccessful() {
+		fmt.Println("Could not get list of VM for cf-warden")
+		return
+	} else {
+		for _, vm := range vms {
+			fmt.Printf("%#v\n", vm)
+		}
+	}
+
+	fmt.Println("")
+	fmt.Println("VMs status in cf-warden deployment:")
 	vmsStatuses, apiResponse := repo.FetchVMsStatus("cf-warden")
 	if apiResponse.IsNotSuccessful() {
 		fmt.Println("Could not fetch VMs status for cf-warden")
