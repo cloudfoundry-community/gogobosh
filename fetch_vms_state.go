@@ -59,7 +59,7 @@ func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsSta
 
 type VMStatusResponse struct {
 	JobName string  `json:"job_name"`
-	Index int   `json:"index"`
+	Index int       `json:"index"`
 	JobState string `json:"job_state"`
 	VMCid string    `json:"vm_cid"`
 	AgentID string  `json:"agent_id"`

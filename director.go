@@ -6,6 +6,7 @@ type DirectorRepository interface {
 	GetReleases() (releases []Release, apiResponse ApiResponse)
 	GetDeployments() (deployments []Deployment, apiResponse ApiResponse)
 	GetTaskStatus(taskID int) (task TaskStatus, apiResponse ApiResponse)
+	ListVMs(deploymentName string) (deploymentVMs []DeploymentVM, apiResponse ApiResponse)
 	FetchVMsStatus(deploymentName string) (vmsStatus []VMStatus, apiResponse ApiResponse)
 }
 

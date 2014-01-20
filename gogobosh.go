@@ -47,6 +47,13 @@ type Deployment struct {
 	Stemcells []NameVersion
 }
 
+type DeploymentVM struct {
+	JobName string
+	Index int
+	VMCid string
+	AgentID string
+}
+
 type NameVersion struct {
 	Name string
 	Version string
