@@ -187,7 +187,10 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 		return
 	}
 
-	if rawResponse.StatusCode > 299 {
+	if rawResponse.StatusCode == 302 {
+		/* DELETE requests do not automatically redirect; all others should not return 302 */
+		apiResponse = NewApiResponseWithRedirect(rawResponse.Header.Get("location"))
+	} else if rawResponse.StatusCode > 299 {
 		errorResponse := gateway.errHandler(rawResponse)
 		message := fmt.Sprintf(
 			"Server error, status code: %d, error code: %s, message: %s",

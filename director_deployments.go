@@ -2,6 +2,7 @@ package gogobosh
 
 import (
 	"fmt"
+	"net/url"
 )
 
 func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, apiResponse ApiResponse) {
@@ -23,6 +24,20 @@ func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, a
 func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiResponse ApiResponse) {
 	path := fmt.Sprintf("/deployments/%s?force=true", deploymentName)
 	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+	if !apiResponse.IsRedirection() {
+		return
+	}
+
+	var taskStatus TaskStatus
+	taskUrl, err := url.Parse(apiResponse.RedirectLocation)
+	if err != nil {
+		return
+	}
+
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+taskUrl.Path, repo.config.Username, repo.config.Password, &taskStatus)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

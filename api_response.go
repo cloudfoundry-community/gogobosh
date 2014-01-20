@@ -2,15 +2,18 @@ package gogobosh
 
 import (
 	"fmt"
+	"net/http"
 )
 
 type ApiResponse struct {
 	Message    string
 	ErrorCode  string
 	StatusCode int
+	RedirectLocation string
 
 	isError    bool
 	isNotFound bool
+	isRedirection bool
 }
 
 func NewApiResponse(message string, errorCode string, statusCode int) (apiResponse ApiResponse) {
@@ -19,6 +22,14 @@ func NewApiResponse(message string, errorCode string, statusCode int) (apiRespon
 		ErrorCode:  errorCode,
 		StatusCode: statusCode,
 		isError:    true,
+	}
+}
+
+func NewApiResponseWithRedirect(location string) (apiResponse ApiResponse) {
+	return ApiResponse{
+		StatusCode:       http.StatusFound,
+		RedirectLocation: location,
+		isRedirection:    true,
 	}
 }
 
@@ -59,6 +70,10 @@ func (apiResponse ApiResponse) IsError() bool {
 
 func (apiResponse ApiResponse) IsNotFound() bool {
 	return apiResponse.isNotFound
+}
+
+func (apiResponse ApiResponse) IsRedirection() bool {
+	return apiResponse.isRedirection
 }
 
 func (apiResponse ApiResponse) IsSuccessful() bool {
