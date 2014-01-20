@@ -3,6 +3,7 @@ package gogobosh
 import (
 	"fmt"
 	"net/url"
+	"time"
 )
 
 func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, apiResponse ApiResponse) {
@@ -40,6 +41,16 @@ func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiR
 	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+taskUrl.Path, repo.config.Username, repo.config.Password, &taskStatus)
 	if apiResponse.IsNotSuccessful() {
 		return
+	}
+
+	/* Progression should be: queued, progressing, done */
+	/* TODO task might fail; end states: done, error, cancelled */
+	for taskStatus.State != "done" {
+		time.Sleep(1)
+		taskStatus, apiResponse = repo.GetTaskStatus(taskStatus.ID)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
 	}
 
 	return

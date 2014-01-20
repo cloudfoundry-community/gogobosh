@@ -74,7 +74,20 @@ var _ = Describe("Deployments", func() {
 				  "result": null,
 				  "user": "admin"
 				}`}})
-		ts, handler, repo := createDirectorRepo(request, queuedTaskRequest)
+		doneTaskRequest := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+			Method: "GET",
+			Path:   "/tasks/20",
+			Response: gogobosh.TestResponse{
+				Status: http.StatusOK,
+				Body: `{
+				  "id": 12,
+				  "state": "done",
+				  "description": "delete deployment cf-warden",
+				  "timestamp": 1390174354,
+				  "result": null,
+				  "user": "admin"
+				}`}})
+		ts, handler, repo := createDirectorRepo(request, queuedTaskRequest, doneTaskRequest)
 		defer ts.Close()
 
 		apiResponse := repo.DeleteDeployment("cf-warden")
