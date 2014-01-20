@@ -84,11 +84,15 @@ func main() {
 		fmt.Printf("%#v\n", task)
 	}
 
-	vms_status, apiResponse := repo.FetchVMsStatus("cf-warden")
+	fmt.Println("")
+	fmt.Println("VMs in cf-warden deployment:")
+	vmsStatuses, apiResponse := repo.FetchVMsStatus("cf-warden")
 	if apiResponse.IsNotSuccessful() {
 		fmt.Println("Could not fetch VMs status for cf-warden")
 		return
 	} else {
-		fmt.Printf("%#v\n", vms_status)
+		for _, vmStatus := range vmsStatuses {
+			fmt.Printf("%s/%d is %s, IPs %#v\n", vmStatus.JobName, vmStatus.Index, vmStatus.JobState, vmStatus.IPs)
+		}
 	}
 }
