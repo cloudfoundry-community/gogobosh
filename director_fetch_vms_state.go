@@ -46,9 +46,9 @@ func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsSta
 		return
 	}
 
-	for _, vmStatusResponse := range strings.Split(string(bytes), "\n") {
-		resource := VMStatusResponse{}
-		err := json.Unmarshal([]byte(vmStatusResponse), &resource)
+	for _, vmStatusItem := range strings.Split(string(bytes), "\n") {
+		resource := vmStatusResponse{}
+		err := json.Unmarshal([]byte(vmStatusItem), &resource)
 		if err == nil {
 			vmsStatuses = append(vmsStatuses, resource.ToModel())
 		}
@@ -57,7 +57,7 @@ func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsSta
 	return
 }
 
-type VMStatusResponse struct {
+type vmStatusResponse struct {
 	JobName string  `json:"job_name"`
 	Index int       `json:"index"`
 	JobState string `json:"job_state"`
@@ -93,7 +93,7 @@ type percentKbResponse struct {
 	Kb int          `json:"kb,string"`
 }
 
-func (resource VMStatusResponse) ToModel() (status VMStatus) {
+func (resource vmStatusResponse) ToModel() (status VMStatus) {
 	status = VMStatus{}
 	status.JobName  = resource.JobName
 	status.Index    = resource.Index

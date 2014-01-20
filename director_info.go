@@ -1,7 +1,7 @@
 package gogobosh
 
 func (repo BoshDirectorRepository) GetInfo() (directorInfo DirectorInfo, apiResponse ApiResponse) {
-	infoResource := DirectorInfoResponse{}
+	infoResource := directorInfoResponse{}
 
 	path := "/info"
 	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &infoResource)
@@ -14,7 +14,7 @@ func (repo BoshDirectorRepository) GetInfo() (directorInfo DirectorInfo, apiResp
 	return
 }
 
-type DirectorInfoResponse struct {
+type directorInfoResponse struct {
 	Name string          `json:"name"`
 	UUID string          `json:"uuid"`
 	Version string       `json:"version"`
@@ -51,7 +51,7 @@ type directorInfoFeaturesSnapshots struct {
 	Status bool `json:"status"`
 }
 
-func (resource DirectorInfoResponse) ToModel() (director DirectorInfo) {
+func (resource directorInfoResponse) ToModel() (director DirectorInfo) {
 	director = DirectorInfo{}
 	director.Name = resource.Name
 	director.Version = resource.Version

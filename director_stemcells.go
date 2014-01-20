@@ -1,7 +1,7 @@
 package gogobosh
 
 func (repo BoshDirectorRepository) GetStemcells() (stemcells []Stemcell, apiResponse ApiResponse) {
-	stemcellsResponse := []StemcellResponse{}
+	stemcellsResponse := []stemcellResponse{}
 
 	path := "/stemcells"
 	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &stemcellsResponse)
@@ -16,13 +16,13 @@ func (repo BoshDirectorRepository) GetStemcells() (stemcells []Stemcell, apiResp
 	return
 }
 
-type StemcellResponse struct {
+type stemcellResponse struct {
 	Name string    `json:"name"`
 	Version string `json:"version"`
 	Cid string     `json:"cid"`
 }
 
-func (resource StemcellResponse) ToModel() (stemcell Stemcell) {
+func (resource stemcellResponse) ToModel() (stemcell Stemcell) {
 	stemcell = Stemcell{}
 	stemcell.Name = resource.Name
 	stemcell.Version = resource.Version

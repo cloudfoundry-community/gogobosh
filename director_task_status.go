@@ -5,7 +5,7 @@ import (
 )
 
 func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task TaskStatus, apiResponse ApiResponse) {
-	taskResponse := TaskStatusResponse{}
+	taskResponse := taskStatusResponse{}
 
 	path := fmt.Sprintf("/tasks/%d", taskID)
 	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &taskResponse)
@@ -18,7 +18,7 @@ func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task TaskStatus, a
 	return
 }
 
-type TaskStatusResponse struct {
+type taskStatusResponse struct {
 	ID int             `json:"id"`
 	State string       `json:"state"`
 	Description string `json:"description"`
@@ -27,7 +27,7 @@ type TaskStatusResponse struct {
 	User string        `json:"user"`
 }
 
-func (resource TaskStatusResponse) ToModel() (task TaskStatus) {
+func (resource taskStatusResponse) ToModel() (task TaskStatus) {
 	task = TaskStatus{}
 
 	task.ID = resource.ID

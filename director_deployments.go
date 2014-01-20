@@ -1,7 +1,7 @@
 package gogobosh
 
 func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, apiResponse ApiResponse) {
-	deploymentsResponse := []DeploymentResponse{}
+	deploymentsResponse := []deploymentResponse{}
 
 	path := "/deployments"
 	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &deploymentsResponse)
@@ -16,7 +16,7 @@ func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, a
 	return
 }
 
-type DeploymentResponse struct {
+type deploymentResponse struct {
 	Name string             `json:"name"`
 	Releases []nameVersion  `json:"deployments"`
 	Stemcells []nameVersion `json:"stemcells"`
@@ -27,7 +27,7 @@ type nameVersion struct {
 	Version string `json:"version"`
 }
 
-func (resource DeploymentResponse) ToModel() (deployment Deployment) {
+func (resource deploymentResponse) ToModel() (deployment Deployment) {
 	deployment = Deployment{}
 	deployment.Name = resource.Name
 	for _, releaseResponse := range resource.Releases {

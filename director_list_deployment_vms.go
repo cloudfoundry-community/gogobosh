@@ -5,7 +5,7 @@ import (
 )
 
 func (repo BoshDirectorRepository) ListDeploymentVMs(deploymentName string) (deploymentVMs []DeploymentVM, apiResponse ApiResponse) {
-	resources := []DeploymentVMResponse{}
+	resources := []deploymentVMResponse{}
 
 	path := fmt.Sprintf("/deployments/%s/vms", deploymentName)
 	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &resources)
@@ -20,14 +20,14 @@ func (repo BoshDirectorRepository) ListDeploymentVMs(deploymentName string) (dep
 	return
 }
 
-type DeploymentVMResponse struct {
+type deploymentVMResponse struct {
 	JobName string  `json:"job"`
 	Index int       `json:"index"`
 	VMCid string    `json:"cid"`
 	AgentID string  `json:"agent_id"`
 }
 
-func (resource DeploymentVMResponse) ToModel() (vm DeploymentVM) {
+func (resource deploymentVMResponse) ToModel() (vm DeploymentVM) {
 	vm = DeploymentVM{}
 	vm.JobName  = resource.JobName
 	vm.Index    = resource.Index
