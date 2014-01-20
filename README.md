@@ -24,24 +24,30 @@ go get github.com/cloudfoundry-community/gogobosh
 package main
 
 import (
-    bosh "github.com/cloudfoundry-community/gogobosh"
+  "github.com/cloudfoundry-community/gogobosh"
+  "fmt"
 )
 
 func main() {
-    director := bosh.New("https://192.168.50.4:25555", "admin", "admin")
-    fmt.Println("Director")
-    fmt.Printf("  Name       %s", director.Name)
-    fmt.Printf("  URL        %s", director.URL)
-    fmt.Printf("  Version    %s", director.Version)
-    fmt.Printf("  User       %s", director.User)
-    fmt.Printf("  UUID       %s", director.UUID)
-    fmt.Printf("  CPI        %s", director.CPI)
-    fmt.Printf("  dns        %s", director.DNSEnabled)
-    fmt.Printf("  compiled_package_cache %s (provider: %s)", director.CompiledPackageCacheEnabled, director.CompiledPackageCacheProvider)
-    fmt.Printf("  snapshots  %s", director.SnapshotsEnabled)
+  director := gogobosh.NewDirector(*target, *username, *password)
+  repo := gogobosh.NewBoshDirectorRepository(&director, gogobosh.NewDirectorGateway())
+
+  info, apiResponse := repo.GetInfo()
+  if apiResponse.IsNotSuccessful() {
+    fmt.Println("Could not fetch BOSH info")
+    return
+  }
+
+  fmt.Println("Director")
+  fmt.Printf("  Name       %s\n", info.Name)
+  fmt.Printf("  URL        %s\n", info.URL)
+  fmt.Printf("  Version    %s\n", info.Version)
+  fmt.Printf("  User       %s\n", info.User)
+  fmt.Printf("  UUID       %s\n", info.UUID)
+  fmt.Printf("  CPI        %s\n", info.CPI)
 }
 ```
 
 ## Tests
 
-The integration tests assume that bosh-lite is running locally.
+Tests are all local currently; and do not test against a running bosh or bosh-lite. I'd like to at least do integration tests against a bosh-lite in future.
