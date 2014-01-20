@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (repo BoshDirectorRepository) ListVMs(deploymentName string) (deploymentVMs []DeploymentVM, apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) ListDeploymentVMs(deploymentName string) (deploymentVMs []DeploymentVM, apiResponse ApiResponse) {
 	resources := []DeploymentVMResponse{}
 
 	path := fmt.Sprintf("/deployments/%s/vms", deploymentName)

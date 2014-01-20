@@ -88,7 +88,7 @@ func main() {
 
 	fmt.Println("")
 	fmt.Println("VMs in cf-warden deployment:")
-	vms, apiResponse := repo.ListVMs("cf-warden")
+	vms, apiResponse := repo.ListDeploymentVMs("cf-warden")
 	if apiResponse.IsNotSuccessful() {
 		fmt.Println("Could not get list of VM for cf-warden")
 		return

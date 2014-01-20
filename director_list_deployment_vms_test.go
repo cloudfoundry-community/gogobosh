@@ -31,7 +31,7 @@ var _ = Describe("simple list of vms", func() {
 		ts, handler, repo := createDirectorRepo(request)
 		defer ts.Close()
 
-		deploymentVMs, apiResponse := repo.ListVMs("cf-warden")
+		deploymentVMs, apiResponse := repo.ListDeploymentVMs("cf-warden")
 
 		Expect(len(deploymentVMs)).To(Equal(2))
 
