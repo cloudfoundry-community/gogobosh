@@ -22,7 +22,7 @@ func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsSta
 	}
 
 	/* Progression should be: queued, progressing, done */
-	/* TODO task might fail */
+	/* TODO task might fail; end states: done, error, cancelled */
 	for taskStatus.State != "done" {
 		time.Sleep(1)
 		taskStatus, apiResponse = repo.GetTaskStatus(taskStatus.ID)
