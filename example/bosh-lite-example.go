@@ -3,12 +3,18 @@ package main
 import (
 	"github.com/cloudfoundry-community/gogobosh"
 	"fmt"
+	"flag"
 )
 
 func main() {
 	gogobosh.Logger = gogobosh.NewLogger()
 
-	director := gogobosh.NewDirector("https://192.168.50.4:25555", "admin", "admin")
+	target := flag.String("target", "https://192.168.50.4:25555", "BOSH director host")
+	username := flag.String("username", "admin", "Login with username")
+	password := flag.String("password", "admin", "Login with password")
+	flag.Parse()
+
+	director := gogobosh.NewDirector(*target, *username, *password)
 	repo := gogobosh.NewBoshDirectorRepository(&director, gogobosh.NewDirectorGateway())
 
 	info, apiResponse := repo.GetInfo()
