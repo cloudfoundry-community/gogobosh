@@ -21,6 +21,8 @@ func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsSta
 		return
 	}
 
+	/* Progression should be: queued, progressing, done */
+	/* TODO task might fail */
 	for taskStatus.State != "done" {
 		time.Sleep(1)
 		taskStatus, apiResponse = repo.GetTaskStatus(taskStatus.ID)
@@ -47,12 +49,9 @@ func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsSta
 	for _, vmStatusResponse := range strings.Split(string(bytes), "\n") {
 		resource := VMStatusResponse{}
 		err := json.Unmarshal([]byte(vmStatusResponse), &resource)
-		if err != nil {
-/*			apiResponse = NewApiResponseWithError("Invalid JSON response from server", err)*/
-			return
+		if err == nil {
+			vmsStatuses = append(vmsStatuses, resource.ToModel())
 		}
-
-		vmsStatuses = append(vmsStatuses, resource.ToModel())
 	}
 
 	return
