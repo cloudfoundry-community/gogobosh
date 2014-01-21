@@ -2,7 +2,10 @@ package gogobosh
 
 type DirectorRepository interface {
 	GetInfo() (directorInfo DirectorInfo, apiResponse ApiResponse)
+
 	GetStemcells() (stemcells []Stemcell, apiResponse ApiResponse)
+	DeleteStemcell(name string, version string) (apiResponse ApiResponse)
+
 	GetReleases() (releases []Release, apiResponse ApiResponse)
 
 	GetDeployments() (deployments []Deployment, apiResponse ApiResponse)

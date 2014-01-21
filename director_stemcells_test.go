@@ -45,4 +45,28 @@ var _ = Describe("get list of stemcells", func() {
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
 	})
+
+	It("DeleteStemcell(name, version)", func() {
+		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+			Method: "DELETE",
+			Path:   "/stemcells/bosh-stemcell/993?force=true",
+			Response: gogobosh.TestResponse{
+				Status: http.StatusFound,
+				Header: http.Header{
+					"Location":{"https://some.host/tasks/24"},
+				},
+			}})
+		ts, handler, repo := createDirectorRepo(
+			request,
+			taskTestRequest(24, "queued"),
+			taskTestRequest(24, "processing"),
+			taskTestRequest(24, "done"),
+		)
+		defer ts.Close()
+
+		apiResponse := repo.DeleteStemcell("bosh-stemcell", "993")
+
+		Expect(apiResponse.IsSuccessful()).To(Equal(true))
+		Expect(handler.AllRequestsCalled()).To(Equal(true))
+	})
 })
