@@ -62,25 +62,12 @@ var _ = Describe("Deployments", func() {
 					"Location":{"https://some.host/tasks/20"},
 				},
 			}})
-		queuedTaskRequest := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
-			Method: "GET",
-			Path:   "/tasks/20",
-			Response: gogobosh.TestResponse{
-				Status: http.StatusOK,
-				Body: taskResponseJSONwithState("queued")}})
-		processingTaskRequest := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
-			Method: "GET",
-			Path:   "/tasks/20",
-			Response: gogobosh.TestResponse{
-				Status: http.StatusOK,
-				Body: taskResponseJSONwithState("processing")}})
-		doneTaskRequest := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
-			Method: "GET",
-			Path:   "/tasks/20",
-			Response: gogobosh.TestResponse{
-				Status: http.StatusOK,
-				Body: taskResponseJSONwithState("done")}})
-		ts, handler, repo := createDirectorRepo(request, queuedTaskRequest, processingTaskRequest, doneTaskRequest)
+		ts, handler, repo := createDirectorRepo(
+			request,
+			taskTestRequest(20, "queued"),
+			taskTestRequest(20, "processing"),
+			taskTestRequest(20, "done"),
+		)
 		defer ts.Close()
 
 		apiResponse := repo.DeleteDeployment("cf-warden")
@@ -90,14 +77,21 @@ var _ = Describe("Deployments", func() {
 	})
 })
 
-func taskResponseJSONwithState(state string) (json string) {
+func taskTestRequest(taskID int, state string) (gogobosh.TestRequest) {
 	baseJSON := `{
-	  "id": 20,
+	  "id": %d,
 	  "state": "%s",
 	  "description": "some task",
 	  "timestamp": 1390174354,
 	  "result": null,
 	  "user": "admin"
 	}`
-	return fmt.Sprintf(baseJSON, state)
+	return gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+		Method: "GET",
+		Path:   fmt.Sprintf("/tasks/%d", taskID),
+		Response: gogobosh.TestResponse{
+			Status: http.StatusOK,
+			Body:   fmt.Sprintf(baseJSON, taskID, state),
+		},
+	})
 }
