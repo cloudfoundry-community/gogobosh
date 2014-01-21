@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http"
+	"fmt"
 )
 
 var _ = Describe("Deployments", func() {
@@ -66,40 +67,19 @@ var _ = Describe("Deployments", func() {
 			Path:   "/tasks/20",
 			Response: gogobosh.TestResponse{
 				Status: http.StatusOK,
-				Body: `{
-				  "id": 20,
-				  "state": "queued",
-				  "description": "delete deployment cf-warden",
-				  "timestamp": 1390174354,
-				  "result": null,
-				  "user": "admin"
-				}`}})
+				Body: taskResponseJSONwithState("queued")}})
 		processingTaskRequest := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
 			Method: "GET",
 			Path:   "/tasks/20",
 			Response: gogobosh.TestResponse{
 				Status: http.StatusOK,
-				Body: `{
-				  "id": 20,
-				  "state": "processing",
-				  "description": "delete deployment cf-warden",
-				  "timestamp": 1390174354,
-				  "result": null,
-				  "user": "admin"
-				}`}})
+				Body: taskResponseJSONwithState("processing")}})
 		doneTaskRequest := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
 			Method: "GET",
 			Path:   "/tasks/20",
 			Response: gogobosh.TestResponse{
 				Status: http.StatusOK,
-				Body: `{
-				  "id": 12,
-				  "state": "done",
-				  "description": "delete deployment cf-warden",
-				  "timestamp": 1390174354,
-				  "result": null,
-				  "user": "admin"
-				}`}})
+				Body: taskResponseJSONwithState("done")}})
 		ts, handler, repo := createDirectorRepo(request, queuedTaskRequest, processingTaskRequest, doneTaskRequest)
 		defer ts.Close()
 
@@ -109,3 +89,15 @@ var _ = Describe("Deployments", func() {
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
 	})
 })
+
+func taskResponseJSONwithState(state string) (json string) {
+	baseJSON := `{
+	  "id": 20,
+	  "state": "%s",
+	  "description": "some task",
+	  "timestamp": 1390174354,
+	  "result": null,
+	  "user": "admin"
+	}`
+	return fmt.Sprintf(baseJSON, state)
+}
