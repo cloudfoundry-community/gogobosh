@@ -38,7 +38,7 @@ var _ = Describe("TaskStatus", func() {
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
 	})
 
-	It("GetTaskStatuses() returns []TaskStatus{}", func() {
+	It("() returns []TaskStatus{}", func() {
 		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
 			Method: "GET",
 			Path:   "/tasks",
@@ -79,4 +79,14 @@ var _ = Describe("TaskStatus", func() {
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
 	})
+
+	// verbose: true/false - show internal tasks
+
+	// limit: nil or integer limit
+	
+	// states: all, processing,cancelling,queued ("running"), or specific list
+	XIt("GetRunningTaskStatuses", func() {
+		// states: processing,cancelling,queued
+	})
+
 })
