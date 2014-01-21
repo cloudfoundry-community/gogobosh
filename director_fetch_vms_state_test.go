@@ -19,32 +19,6 @@ var _ = Describe("parse full vms task output", func() {
 				},
 			},
 		})
-		queuedTaskRequest := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
-			Method: "GET",
-			Path:   "/tasks/12",
-			Response: gogobosh.TestResponse{
-				Status: http.StatusOK,
-				Body: `{
-				  "id": 12,
-				  "state": "queued",
-				  "description": "retrieve vm-stats",
-				  "timestamp": 1390174354,
-				  "result": null,
-				  "user": "admin"
-				}`}})
-		doneTaskRequest := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
-			Method: "GET",
-			Path:   "/tasks/12",
-			Response: gogobosh.TestResponse{
-				Status: http.StatusOK,
-				Body: `{
-				  "id": 12,
-				  "state": "done",
-				  "description": "retrieve vm-stats",
-				  "timestamp": 1390174354,
-				  "result": null,
-				  "user": "admin"
-				}`}})
 		taskOutputRequest := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
 			Method: "GET",
 			Path:   "/tasks/12/output?type=result",
@@ -54,7 +28,12 @@ var _ = Describe("parse full vms task output", func() {
 				{"vm_cid":"vm-affdbbdb-b91e-4838-b068-f1a057242169","ips":["10.244.0.38"],"dns":[],"agent_id":"bec309f8-0e2d-4843-9db3-a419adab4d38","job_name":"etcd_leader_z1","index":0,"job_state":"running","resource_pool":"medium_z1","vitals":{"load":["0.13","0.22","0.18"],"cpu":{"user":"0.4","sys":"2.0","wait":"0.1"},"mem":{"percent":"46.8","kb":"2863012"},"swap":{"percent":"0.0","kb":"0"},"disk":{"system":{"percent":null},"persistent":{"percent":"1"}}},"resurrection_paused":false}
 				`}})
 
-		ts, handler, repo := createDirectorRepo(vmsRequest, queuedTaskRequest, doneTaskRequest, taskOutputRequest)
+		ts, handler, repo := createDirectorRepo(
+			vmsRequest,
+			taskTestRequest(12, "queued"),
+			taskTestRequest(12, "processing"),
+			taskTestRequest(12, "done"),
+			taskOutputRequest)
 		defer ts.Close()
 
 		vm_statuses, apiResponse := repo.FetchVMsStatus("cf-warden")
