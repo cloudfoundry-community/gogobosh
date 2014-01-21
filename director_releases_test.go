@@ -67,4 +67,52 @@ var _ = Describe("get list of releases", func() {
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
 	})
+
+	It("DeleteReleases(name)", func() {
+		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+			Method: "DELETE",
+			Path:   "/releases/cf?force=true",
+			Response: gogobosh.TestResponse{
+				Status: http.StatusFound,
+				Header: http.Header{
+					"Location":{"https://some.host/tasks/25"},
+				},
+			}})
+		ts, handler, repo := createDirectorRepo(
+			request,
+			taskTestRequest(25, "queued"),
+			taskTestRequest(25, "processing"),
+			taskTestRequest(25, "done"),
+		)
+		defer ts.Close()
+
+		apiResponse := repo.DeleteReleases("cf")
+
+		Expect(apiResponse.IsSuccessful()).To(Equal(true))
+		Expect(handler.AllRequestsCalled()).To(Equal(true))
+	})
+
+	It("DeleteRelease(name, version)", func() {
+		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+			Method: "DELETE",
+			Path:   "/releases/cf?force=true&version=144",
+			Response: gogobosh.TestResponse{
+				Status: http.StatusFound,
+				Header: http.Header{
+					"Location":{"https://some.host/tasks/26"},
+				},
+			}})
+		ts, handler, repo := createDirectorRepo(
+			request,
+			taskTestRequest(26, "queued"),
+			taskTestRequest(26, "processing"),
+			taskTestRequest(26, "done"),
+		)
+		defer ts.Close()
+
+		apiResponse := repo.DeleteRelease("cf", "144")
+
+		Expect(apiResponse.IsSuccessful()).To(Equal(true))
+		Expect(handler.AllRequestsCalled()).To(Equal(true))
+	})
 })

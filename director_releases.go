@@ -1,5 +1,11 @@
 package gogobosh
 
+import (
+	"fmt"
+	"net/url"
+	"time"
+)
+
 func (repo BoshDirectorRepository) GetReleases() (releases []Release, apiResponse ApiResponse) {
 	releasesResponse := []releaseResponse{}
 
@@ -11,6 +17,74 @@ func (repo BoshDirectorRepository) GetReleases() (releases []Release, apiRespons
 
 	for _, resource := range releasesResponse {
 		releases = append(releases, resource.ToModel())
+	}
+
+	return
+}
+
+func (repo BoshDirectorRepository) DeleteReleases(name string) (apiResponse ApiResponse) {
+	path := fmt.Sprintf("/releases/%s?force=true", name)
+	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+	if !apiResponse.IsRedirection() {
+		return
+	}
+
+	var taskStatus TaskStatus
+	taskUrl, err := url.Parse(apiResponse.RedirectLocation)
+	if err != nil {
+		return
+	}
+
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+taskUrl.Path, repo.config.Username, repo.config.Password, &taskStatus)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	/* Progression should be: queued, progressing, done */
+	/* TODO task might fail; end states: done, error, cancelled */
+	for taskStatus.State != "done" {
+		time.Sleep(1)
+		taskStatus, apiResponse = repo.GetTaskStatus(taskStatus.ID)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
+	}
+
+	return
+}
+
+func (repo BoshDirectorRepository) DeleteRelease(name string, version string) (apiResponse ApiResponse) {
+	path := fmt.Sprintf("/releases/%s?force=true&version=%s", name, version)
+	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+	if !apiResponse.IsRedirection() {
+		return
+	}
+
+	var taskStatus TaskStatus
+	taskUrl, err := url.Parse(apiResponse.RedirectLocation)
+	if err != nil {
+		return
+	}
+
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+taskUrl.Path, repo.config.Username, repo.config.Password, &taskStatus)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	/* Progression should be: queued, progressing, done */
+	/* TODO task might fail; end states: done, error, cancelled */
+	for taskStatus.State != "done" {
+		time.Sleep(1)
+		taskStatus, apiResponse = repo.GetTaskStatus(taskStatus.ID)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
 	}
 
 	return
@@ -28,9 +102,9 @@ type releaseVersionResponse struct {
 	CurrentlyDeployed bool  `json:"currently_deployed"`
 }
 
-func (resource releaseResponse) ToModel() (stemcell Release) {
-	stemcell = Release{}
-	stemcell.Name = resource.Name
+func (resource releaseResponse) ToModel() (release Release) {
+	release = Release{}
+	release.Name = resource.Name
 	for _, versionResponse := range resource.Versions {
 		version := ReleaseVersion{}
 		version.Version = versionResponse.Version
@@ -38,7 +112,7 @@ func (resource releaseResponse) ToModel() (stemcell Release) {
 		version.UncommittedChanges = versionResponse.UncommittedChanges
 		version.CurrentlyDeployed = versionResponse.CurrentlyDeployed
 
-		stemcell.Versions = append(stemcell.Versions, version)
+		release.Versions = append(release.Versions, version)
 	}
 	return
 }

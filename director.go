@@ -7,6 +7,8 @@ type DirectorRepository interface {
 	DeleteStemcell(name string, version string) (apiResponse ApiResponse)
 
 	GetReleases() (releases []Release, apiResponse ApiResponse)
+	DeleteReleases(name string) (apiResponse ApiResponse)
+	DeleteRelease(name string, version string) (apiResponse ApiResponse)
 
 	GetDeployments() (deployments []Deployment, apiResponse ApiResponse)
 	DeleteDeployment(deploymentName string) (apiResponse ApiResponse)
