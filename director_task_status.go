@@ -4,6 +4,22 @@ import (
 	"fmt"
 )
 
+func (repo BoshDirectorRepository) GetTaskStatuses() (tasks []TaskStatus, apiResponse ApiResponse) {
+	taskResponses := []taskStatusResponse{}
+
+	path := fmt.Sprintf("/tasks")
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &taskResponses)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	for _, resource := range taskResponses {
+		tasks = append(tasks, resource.ToModel())
+	}
+
+	return
+}
+
 func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task TaskStatus, apiResponse ApiResponse) {
 	taskResponse := taskStatusResponse{}
 

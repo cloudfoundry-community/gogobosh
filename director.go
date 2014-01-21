@@ -12,10 +12,11 @@ type DirectorRepository interface {
 
 	GetDeployments() (deployments []Deployment, apiResponse ApiResponse)
 	DeleteDeployment(deploymentName string) (apiResponse ApiResponse)
-
-	GetTaskStatus(taskID int) (task TaskStatus, apiResponse ApiResponse)
 	ListDeploymentVMs(deploymentName string) (deploymentVMs []DeploymentVM, apiResponse ApiResponse)
 	FetchVMsStatus(deploymentName string) (vmsStatus []VMStatus, apiResponse ApiResponse)
+
+	GetTaskStatuses() (task []TaskStatus, apiResponse ApiResponse)
+	GetTaskStatus(taskID int) (task TaskStatus, apiResponse ApiResponse)
 }
 
 type BoshDirectorRepository struct {
