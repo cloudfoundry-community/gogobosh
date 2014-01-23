@@ -1,4 +1,4 @@
 /*
-Implementation of BOSH API client functions
+Package api implements the BOSH API client functions
 */
 package api
