@@ -1,4 +1,4 @@
-package gogobosh
+package utils
 
 import (
 	"bytes"

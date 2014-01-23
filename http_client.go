@@ -8,6 +8,7 @@ import (
 	"net/http/httputil"
 	"regexp"
 	"strings"
+	. "github.com/cloudfoundry-community/gogobosh/utils"
 )
 
 const (
