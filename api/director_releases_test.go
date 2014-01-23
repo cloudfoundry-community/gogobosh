@@ -58,11 +58,11 @@ var _ = Describe("get list of releases", func() {
 		release := releases[0]
 		Expect(release.Name).To(Equal("cf"))
 
-		release_version := release.Versions[0]
-		Expect(release_version.Version).To(Equal("153"))
-		Expect(release_version.CommitHash).To(Equal("009fdd9a"))
-		Expect(release_version.UncommittedChanges).To(Equal(true))
-		Expect(release_version.CurrentlyDeployed).To(Equal(true))
+		releaseVersion := release.Versions[0]
+		Expect(releaseVersion.Version).To(Equal("153"))
+		Expect(releaseVersion.CommitHash).To(Equal("009fdd9a"))
+		Expect(releaseVersion.UncommittedChanges).To(Equal(true))
+		Expect(releaseVersion.CurrentlyDeployed).To(Equal(true))
 
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
