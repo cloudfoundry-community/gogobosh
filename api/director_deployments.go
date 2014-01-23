@@ -35,12 +35,12 @@ func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiR
 	}
 
 	var taskStatus gogobosh.TaskStatus
-	taskUrl, err := url.Parse(apiResponse.RedirectLocation)
+	taskURL, err := url.Parse(apiResponse.RedirectLocation)
 	if err != nil {
 		return
 	}
 
-	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+taskUrl.Path, repo.config.Username, repo.config.Password, &taskStatus)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+taskURL.Path, repo.config.Username, repo.config.Password, &taskStatus)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
