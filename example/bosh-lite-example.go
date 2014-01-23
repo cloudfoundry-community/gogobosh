@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/cloudfoundry-community/gogobosh"
-	utils "github.com/cloudfoundry-community/gogobosh/utils"
+	"github.com/cloudfoundry-community/gogobosh/api"
+	"github.com/cloudfoundry-community/gogobosh/net"
+	"github.com/cloudfoundry-community/gogobosh/utils"
 	"fmt"
 	"flag"
 )
@@ -16,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	director := gogobosh.NewDirector(*target, *username, *password)
-	repo := gogobosh.NewBoshDirectorRepository(&director, gogobosh.NewDirectorGateway())
+	repo := api.NewBoshDirectorRepository(&director, net.NewDirectorGateway())
 
 	info, apiResponse := repo.GetInfo()
 	if apiResponse.IsNotSuccessful() {

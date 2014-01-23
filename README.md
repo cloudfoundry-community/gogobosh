@@ -60,20 +60,23 @@ package main
 
 import (
   "github.com/cloudfoundry-community/gogobosh"
+  "github.com/cloudfoundry-community/gogobosh/api"
+  "github.com/cloudfoundry-community/gogobosh/net"
+  "github.com/cloudfoundry-community/gogobosh/utils"
   "fmt"
-	"flag"
+  "flag"
 )
 
 func main() {
-	gogobosh.Logger = gogobosh.NewLogger()
+  utils.Logger = utils.NewLogger()
 
-	target := flag.String("target", "https://192.168.50.4:25555", "BOSH director host")
-	username := flag.String("username", "admin", "Login with username")
-	password := flag.String("password", "admin", "Login with password")
-	flag.Parse()
+  target := flag.String("target", "https://192.168.50.4:25555", "BOSH director host")
+  username := flag.String("username", "admin", "Login with username")
+  password := flag.String("password", "admin", "Login with password")
+  flag.Parse()
 
   director := gogobosh.NewDirector(*target, *username, *password)
-  repo := gogobosh.NewBoshDirectorRepository(&director, gogobosh.NewDirectorGateway())
+  repo := api.NewBoshDirectorRepository(&director, net.NewDirectorGateway())
 
   info, apiResponse := repo.GetInfo()
   if apiResponse.IsNotSuccessful() {
