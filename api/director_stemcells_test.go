@@ -1,7 +1,7 @@
-package gogobosh_test
+package api_test
 
 import (
-	gogobosh "github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http"
@@ -9,10 +9,10 @@ import (
 
 var _ = Describe("get list of stemcells", func() {
 	It("GET /stemcells to return []DirectorStemcell{}", func() {
-		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "GET",
 			Path:   "/stemcells",
-			Response: gogobosh.TestResponse{
+			Response: testhelpers.TestResponse{
 				Status: http.StatusOK,
 				Body: `[
 				  {
@@ -47,10 +47,10 @@ var _ = Describe("get list of stemcells", func() {
 	})
 
 	It("DeleteStemcell(name, version)", func() {
-		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "DELETE",
 			Path:   "/stemcells/bosh-stemcell/993?force=true",
-			Response: gogobosh.TestResponse{
+			Response: testhelpers.TestResponse{
 				Status: http.StatusFound,
 				Header: http.Header{
 					"Location":{"https://some.host/tasks/24"},

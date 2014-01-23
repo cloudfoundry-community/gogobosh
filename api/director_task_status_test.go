@@ -1,18 +1,18 @@
-package gogobosh_test
+package api_test
 
 import (
-	gogobosh "github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http"
 )
 
-var _ = Describe("TaskStatus", func() {
-	It("GetTaskStatus returns TaskStatus{}", func() {
-		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+var _ = Describe("gogobosh.TaskStatus", func() {
+	It("GetTaskStatus returns gogobosh.TaskStatus{}", func() {
+		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "GET",
 			Path:   "/tasks/1",
-			Response: gogobosh.TestResponse{
+			Response: testhelpers.TestResponse{
 				Status: http.StatusOK,
 				Body: `{
 				  "id": 1,
@@ -38,11 +38,11 @@ var _ = Describe("TaskStatus", func() {
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
 	})
 
-	It("() returns []TaskStatus{}", func() {
-		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+	It("() returns []gogobosh.TaskStatus{}", func() {
+		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "GET",
 			Path:   "/tasks",
-			Response: gogobosh.TestResponse{
+			Response: testhelpers.TestResponse{
 				Status: http.StatusOK,
 				Body: `[{
 				    "id": 2,

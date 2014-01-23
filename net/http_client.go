@@ -1,4 +1,4 @@
-package gogobosh
+package net
 
 import (
 	"crypto/tls"
@@ -8,7 +8,7 @@ import (
 	"net/http/httputil"
 	"regexp"
 	"strings"
-	utils "github.com/cloudfoundry-community/gogobosh/utils"
+	"github.com/cloudfoundry-community/gogobosh/utils"
 )
 
 const (

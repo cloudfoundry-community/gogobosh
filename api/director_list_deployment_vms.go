@@ -1,10 +1,12 @@
-package gogobosh
+package api
 
 import (
 	"fmt"
+	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) ListDeploymentVMs(deploymentName string) (deploymentVMs []DeploymentVM, apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) ListDeploymentVMs(deploymentName string) (deploymentVMs []gogobosh.DeploymentVM, apiResponse net.ApiResponse) {
 	resources := []deploymentVMResponse{}
 
 	path := fmt.Sprintf("/deployments/%s/vms", deploymentName)
@@ -27,8 +29,8 @@ type deploymentVMResponse struct {
 	AgentID string  `json:"agent_id"`
 }
 
-func (resource deploymentVMResponse) ToModel() (vm DeploymentVM) {
-	vm = DeploymentVM{}
+func (resource deploymentVMResponse) ToModel() (vm gogobosh.DeploymentVM) {
+	vm = gogobosh.DeploymentVM{}
 	vm.JobName  = resource.JobName
 	vm.Index    = resource.Index
 	vm.VMCid    = resource.VMCid

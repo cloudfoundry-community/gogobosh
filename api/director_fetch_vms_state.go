@@ -1,19 +1,21 @@
-package gogobosh
+package api
 
 import (
 	"fmt"
 	"time"
 	"strings"
 	"encoding/json"
+	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsStatuses []VMStatus, apiResponse ApiResponse) {
-	var taskStatus TaskStatus
+func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsStatuses []gogobosh.VMStatus, apiResponse net.ApiResponse) {
+	var taskStatus gogobosh.TaskStatus
 
 	/*
 	* Two API calls
 	* 1. GET /deployments/%s/vms?format=full and be redirected to a /tasks/123
-	* 2. Streaming GET on /tasks/123/output?type=result - each line is a VMStatus
+	* 2. Streaming GET on /tasks/123/output?type=result - each line is a gogobosh.VMStatus
 	*/
 	path := fmt.Sprintf("/deployments/%s/vms?format=full", deploymentName)
 	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &taskStatus)
@@ -93,8 +95,8 @@ type percentKbResponse struct {
 	Kb int          `json:"kb,string"`
 }
 
-func (resource vmStatusResponse) ToModel() (status VMStatus) {
-	status = VMStatus{}
+func (resource vmStatusResponse) ToModel() (status gogobosh.VMStatus) {
+	status = gogobosh.VMStatus{}
 	status.JobName  = resource.JobName
 	status.Index    = resource.Index
 	status.JobState = resource.JobState

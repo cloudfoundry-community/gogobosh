@@ -1,12 +1,14 @@
-package gogobosh
+package api
 
 import (
 	"fmt"
 	"net/url"
 	"time"
+	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) GetDeployments() (deployments []gogobosh.Deployment, apiResponse net.ApiResponse) {
 	deploymentsResponse := []deploymentResponse{}
 
 	path := "/deployments"
@@ -22,7 +24,7 @@ func (repo BoshDirectorRepository) GetDeployments() (deployments []Deployment, a
 	return
 }
 
-func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/deployments/%s?force=true", deploymentName)
 	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
 	if apiResponse.IsNotSuccessful() {
@@ -32,7 +34,7 @@ func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiR
 		return
 	}
 
-	var taskStatus TaskStatus
+	var taskStatus gogobosh.TaskStatus
 	taskUrl, err := url.Parse(apiResponse.RedirectLocation)
 	if err != nil {
 		return
@@ -67,11 +69,11 @@ type nameVersion struct {
 	Version string `json:"version"`
 }
 
-func (resource deploymentResponse) ToModel() (deployment Deployment) {
-	deployment = Deployment{}
+func (resource deploymentResponse) ToModel() (deployment gogobosh.Deployment) {
+	deployment = gogobosh.Deployment{}
 	deployment.Name = resource.Name
 	for _, releaseResponse := range resource.Releases {
-		release := NameVersion{}
+		release := gogobosh.NameVersion{}
 		release.Name = releaseResponse.Name
 		release.Version = releaseResponse.Version
 
@@ -79,7 +81,7 @@ func (resource deploymentResponse) ToModel() (deployment Deployment) {
 	}
 
 	for _, stemcellResponse := range resource.Stemcells {
-		stemcell := NameVersion{}
+		stemcell := gogobosh.NameVersion{}
 		stemcell.Name = stemcellResponse.Name
 		stemcell.Version = stemcellResponse.Version
 

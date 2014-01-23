@@ -1,6 +1,11 @@
-package gogobosh
+package api
 
-func (repo BoshDirectorRepository) GetInfo() (directorInfo DirectorInfo, apiResponse ApiResponse) {
+import (
+	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/net"
+)
+
+func (repo BoshDirectorRepository) GetInfo() (directorInfo gogobosh.DirectorInfo, apiResponse net.ApiResponse) {
 	infoResource := directorInfoResponse{}
 
 	path := "/info"
@@ -51,8 +56,8 @@ type directorInfoFeaturesSnapshots struct {
 	Status bool `json:"status"`
 }
 
-func (resource directorInfoResponse) ToModel() (director DirectorInfo) {
-	director = DirectorInfo{}
+func (resource directorInfoResponse) ToModel() (director gogobosh.DirectorInfo) {
+	director = gogobosh.DirectorInfo{}
 	director.Name = resource.Name
 	director.Version = resource.Version
 	director.User = resource.User

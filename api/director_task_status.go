@@ -1,10 +1,12 @@
-package gogobosh
+package api
 
 import (
 	"fmt"
+	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) GetTaskStatuses() (tasks []TaskStatus, apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) GetTaskStatuses() (tasks []gogobosh.TaskStatus, apiResponse net.ApiResponse) {
 	taskResponses := []taskStatusResponse{}
 
 	path := fmt.Sprintf("/tasks")
@@ -20,7 +22,7 @@ func (repo BoshDirectorRepository) GetTaskStatuses() (tasks []TaskStatus, apiRes
 	return
 }
 
-func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task TaskStatus, apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task gogobosh.TaskStatus, apiResponse net.ApiResponse) {
 	taskResponse := taskStatusResponse{}
 
 	path := fmt.Sprintf("/tasks/%d", taskID)
@@ -43,8 +45,8 @@ type taskStatusResponse struct {
 	User string        `json:"user"`
 }
 
-func (resource taskStatusResponse) ToModel() (task TaskStatus) {
-	task = TaskStatus{}
+func (resource taskStatusResponse) ToModel() (task gogobosh.TaskStatus) {
+	task = gogobosh.TaskStatus{}
 
 	task.ID = resource.ID
 	task.State = resource.State

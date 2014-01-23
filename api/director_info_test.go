@@ -1,7 +1,10 @@
-package gogobosh_test
+package api_test
 
 import (
-	gogobosh "github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/api"
+	"github.com/cloudfoundry-community/gogobosh/net"
+	"github.com/cloudfoundry-community/gogobosh/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http"
@@ -10,10 +13,10 @@ import (
 
 var _ = Describe("get director info", func() {
 	It("GET /info to return Director{}", func() {
-		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "GET",
 			Path:   "/info",
-			Response: gogobosh.TestResponse{
+			Response: testhelpers.TestResponse{
 				Status: http.StatusOK,
 				Body: `{
 				  "name": "Bosh Lite Director",
@@ -60,15 +63,15 @@ var _ = Describe("get director info", func() {
 	})
 })
 
-func createDirectorRepo(reqs ...gogobosh.TestRequest) (ts *httptest.Server, handler *gogobosh.TestHandler, repo gogobosh.DirectorRepository) {
-	ts, handler = gogobosh.NewTLSServer(reqs)
+func createDirectorRepo(reqs ...testhelpers.TestRequest) (ts *httptest.Server, handler *testhelpers.TestHandler, repo api.DirectorRepository) {
+	ts, handler = testhelpers.NewTLSServer(reqs)
 	config := &gogobosh.Director{
 		TargetURL: ts.URL,
 		Username:  "admin",
 		Password:  "admin",
 	}
-	gateway := gogobosh.NewDirectorGateway()
-	repo = gogobosh.NewBoshDirectorRepository(config, gateway)
+	gateway := net.NewDirectorGateway()
+	repo = api.NewBoshDirectorRepository(config, gateway)
 	return
 }
 

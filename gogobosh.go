@@ -1,8 +1,5 @@
 package gogobosh
 
-const (
-	Version = "0.1.0"
-)
 type Director struct {
 	TargetURL string
 	Username  string

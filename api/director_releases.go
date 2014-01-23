@@ -1,12 +1,14 @@
-package gogobosh
+package api
 
 import (
 	"fmt"
 	"net/url"
 	"time"
+	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) GetReleases() (releases []Release, apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) GetReleases() (releases []gogobosh.Release, apiResponse net.ApiResponse) {
 	releasesResponse := []releaseResponse{}
 
 	path := "/releases"
@@ -22,7 +24,7 @@ func (repo BoshDirectorRepository) GetReleases() (releases []Release, apiRespons
 	return
 }
 
-func (repo BoshDirectorRepository) DeleteReleases(name string) (apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) DeleteReleases(name string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/releases/%s?force=true", name)
 	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
 	if apiResponse.IsNotSuccessful() {
@@ -32,7 +34,7 @@ func (repo BoshDirectorRepository) DeleteReleases(name string) (apiResponse ApiR
 		return
 	}
 
-	var taskStatus TaskStatus
+	var taskStatus gogobosh.TaskStatus
 	taskUrl, err := url.Parse(apiResponse.RedirectLocation)
 	if err != nil {
 		return
@@ -56,7 +58,7 @@ func (repo BoshDirectorRepository) DeleteReleases(name string) (apiResponse ApiR
 	return
 }
 
-func (repo BoshDirectorRepository) DeleteRelease(name string, version string) (apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) DeleteRelease(name string, version string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/releases/%s?force=true&version=%s", name, version)
 	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
 	if apiResponse.IsNotSuccessful() {
@@ -66,7 +68,7 @@ func (repo BoshDirectorRepository) DeleteRelease(name string, version string) (a
 		return
 	}
 
-	var taskStatus TaskStatus
+	var taskStatus gogobosh.TaskStatus
 	taskUrl, err := url.Parse(apiResponse.RedirectLocation)
 	if err != nil {
 		return
@@ -102,11 +104,11 @@ type releaseVersionResponse struct {
 	CurrentlyDeployed bool  `json:"currently_deployed"`
 }
 
-func (resource releaseResponse) ToModel() (release Release) {
-	release = Release{}
+func (resource releaseResponse) ToModel() (release gogobosh.Release) {
+	release = gogobosh.Release{}
 	release.Name = resource.Name
 	for _, versionResponse := range resource.Versions {
-		version := ReleaseVersion{}
+		version := gogobosh.ReleaseVersion{}
 		version.Version = versionResponse.Version
 		version.CommitHash = versionResponse.CommitHash
 		version.UncommittedChanges = versionResponse.UncommittedChanges

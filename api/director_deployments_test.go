@@ -1,7 +1,7 @@
-package gogobosh_test
+package api_test
 
 import (
-	gogobosh "github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http"
@@ -10,10 +10,10 @@ import (
 
 var _ = Describe("Deployments", func() {
 	It("GetDeployments() - list of deployments", func() {
-		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "GET",
 			Path:   "/deployments",
-			Response: gogobosh.TestResponse{
+			Response: testhelpers.TestResponse{
 				Status: http.StatusOK,
 				Body: `[
 				  {
@@ -53,10 +53,10 @@ var _ = Describe("Deployments", func() {
 	})
 
 	It("DeleteDeployment(name) forcefully", func() {
-		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "DELETE",
 			Path:   "/deployments/cf-warden?force=true",
-			Response: gogobosh.TestResponse{
+			Response: testhelpers.TestResponse{
 				Status: http.StatusFound,
 				Header: http.Header{
 					"Location":{"https://some.host/tasks/20"},
@@ -77,8 +77,8 @@ var _ = Describe("Deployments", func() {
 	})
 })
 
-// Shared helper for asserting that a /tasks/ID is requested and returns a TaskStatus response
-func taskTestRequest(taskID int, state string) (gogobosh.TestRequest) {
+// Shared helper for asserting that a /tasks/ID is requested and returns a gogobosh.TaskStatus response
+func taskTestRequest(taskID int, state string) (testhelpers.TestRequest) {
 	baseJSON := `{
 	  "id": %d,
 	  "state": "%s",
@@ -87,10 +87,10 @@ func taskTestRequest(taskID int, state string) (gogobosh.TestRequest) {
 	  "result": null,
 	  "user": "admin"
 	}`
-	return gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+	return testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 		Method: "GET",
 		Path:   fmt.Sprintf("/tasks/%d", taskID),
-		Response: gogobosh.TestResponse{
+		Response: testhelpers.TestResponse{
 			Status: http.StatusOK,
 			Body:   fmt.Sprintf(baseJSON, taskID, state),
 		},

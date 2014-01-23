@@ -1,12 +1,14 @@
-package gogobosh
+package api
 
 import (
 	"fmt"
 	"net/url"
 	"time"
+	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) GetStemcells() (stemcells []Stemcell, apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) GetStemcells() (stemcells []gogobosh.Stemcell, apiResponse net.ApiResponse) {
 	stemcellsResponse := []stemcellResponse{}
 
 	path := "/stemcells"
@@ -22,7 +24,7 @@ func (repo BoshDirectorRepository) GetStemcells() (stemcells []Stemcell, apiResp
 	return
 }
 
-func (repo BoshDirectorRepository) DeleteStemcell(name string, version string) (apiResponse ApiResponse) {
+func (repo BoshDirectorRepository) DeleteStemcell(name string, version string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/stemcells/%s/%s?force=true", name, version)
 	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
 	if apiResponse.IsNotSuccessful() {
@@ -32,7 +34,7 @@ func (repo BoshDirectorRepository) DeleteStemcell(name string, version string) (
 		return
 	}
 
-	var taskStatus TaskStatus
+	var taskStatus gogobosh.TaskStatus
 	taskUrl, err := url.Parse(apiResponse.RedirectLocation)
 	if err != nil {
 		return
@@ -62,8 +64,8 @@ type stemcellResponse struct {
 	Cid string     `json:"cid"`
 }
 
-func (resource stemcellResponse) ToModel() (stemcell Stemcell) {
-	stemcell = Stemcell{}
+func (resource stemcellResponse) ToModel() (stemcell gogobosh.Stemcell) {
+	stemcell = gogobosh.Stemcell{}
 	stemcell.Name = resource.Name
 	stemcell.Version = resource.Version
 	stemcell.Cid = resource.Cid

@@ -1,4 +1,4 @@
-package gogobosh
+package net
 
 import (
 	"fmt"

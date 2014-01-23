@@ -1,4 +1,4 @@
-package gogobosh
+package net
 
 import (
 	"encoding/json"
@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"github.com/cloudfoundry-community/gogobosh/constants"
 )
 
 const (
@@ -120,7 +121,7 @@ func (gateway Gateway) NewRequest(method, path, username string, password string
 
 	request.Header.Set("accept", "application/json")
 	request.Header.Set("content-type", "application/json")
-	request.Header.Set("User-Agent", "gogobosh "+Version+" / "+runtime.GOOS)
+	request.Header.Set("User-Agent", "gogobosh "+constants.Version+" / "+runtime.GOOS)
 
 	if body != nil {
 		switch v := body.(type) {

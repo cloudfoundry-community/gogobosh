@@ -1,18 +1,18 @@
-package gogobosh_test
+package api_test
 
 import (
-	gogobosh "github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http"
 )
 
 var _ = Describe("simple list of vms", func() {
-	It("GET /deployments/$name/vms to return []DeploymentVM{}", func() {
-		request := gogobosh.NewDirectorTestRequest(gogobosh.TestRequest{
+	It("GET /deployments/$name/vms to return []gogobosh.DeploymentVM{}", func() {
+		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "GET",
 			Path:   "/deployments/cf-warden/vms",
-			Response: gogobosh.TestResponse{
+			Response: testhelpers.TestResponse{
 				Status: http.StatusOK,
 				Body: `[
 				  {
