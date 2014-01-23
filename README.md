@@ -37,6 +37,16 @@ If you are using this library, or the Ruby library within the `bosh_cli` rubygem
 go get github.com/cloudfoundry-community/gogobosh
 ````
 
+## Documentation
+
+The documentation is published to [https://godoc.org/github.com/cloudfoundry-community/gogobosh](https://godoc.org/github.com/cloudfoundry-community/gogobosh).
+
+Also, view the documentation locally with:
+
+```
+godoc -goroot=$GOPATH github.com/cloudfoundry-community/gogobosh
+```
+
 ### Use
 
 There is an extensive [example application](https://github.com/cloudfoundry-community/gogobosh/blob/master/example/bosh-lite-example.go) showing usage of many of the read-only functions.
