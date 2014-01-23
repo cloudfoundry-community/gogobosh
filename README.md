@@ -4,6 +4,8 @@ This project is a golang library for applications wanting to talk to a BOSH/Micr
 
 <a href='http://www.babygopher.com'><img src='https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png' ></a>
 
+[![GoDoc](https://godoc.org/github.com/cloudfoundry-community/gogobosh?status.png)](https://godoc.org/github.com/cloudfoundry-community/gogobosh)
+
 ## API
 
 The following client functions are available, as a subset of the full BOSH Director API.
