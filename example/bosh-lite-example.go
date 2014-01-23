@@ -2,12 +2,13 @@ package main
 
 import (
 	"github.com/cloudfoundry-community/gogobosh"
+	utils "github.com/cloudfoundry-community/gogobosh/utils"
 	"fmt"
 	"flag"
 )
 
 func main() {
-	gogobosh.Logger = gogobosh.NewLogger()
+	utils.Logger = utils.NewLogger()
 
 	target := flag.String("target", "https://192.168.50.4:25555", "BOSH director host")
 	username := flag.String("username", "admin", "Login with username")

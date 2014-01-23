@@ -8,7 +8,7 @@ import (
 	"net/http/httputil"
 	"regexp"
 	"strings"
-	. "github.com/cloudfoundry-community/gogobosh/utils"
+	utils "github.com/cloudfoundry-community/gogobosh/utils"
 )
 
 const (
@@ -82,11 +82,11 @@ func dumpRequest(req *http.Request) {
 	shouldDisplayBody := !strings.Contains(req.Header.Get("Content-Type"), "multipart/form-data")
 	dumpedRequest, err := httputil.DumpRequest(req, shouldDisplayBody)
 	if err != nil {
-		Logger.Printf("Error dumping request\n%s\n", err)
+		utils.Logger.Printf("Error dumping request\n%s\n", err)
 	} else {
-		Logger.Printf("\n%s\n%s\n", "REQUEST:", Sanitize(string(dumpedRequest)))
+		utils.Logger.Printf("\n%s\n%s\n", "REQUEST:", Sanitize(string(dumpedRequest)))
 		if !shouldDisplayBody {
-			Logger.Println("[MULTIPART/FORM-DATA CONTENT HIDDEN]")
+			utils.Logger.Println("[MULTIPART/FORM-DATA CONTENT HIDDEN]")
 		}
 	}
 }
@@ -94,8 +94,8 @@ func dumpRequest(req *http.Request) {
 func dumpResponse(res *http.Response) {
 	dumpedResponse, err := httputil.DumpResponse(res, true)
 	if err != nil {
-		Logger.Printf("Error dumping response\n%s\n", err)
+		utils.Logger.Printf("Error dumping response\n%s\n", err)
 	} else {
-		Logger.Printf("\n%s\n%s\n", "RESPONSE:", Sanitize(string(dumpedResponse)))
+		utils.Logger.Printf("\n%s\n%s\n", "RESPONSE:", Sanitize(string(dumpedResponse)))
 	}
 }
