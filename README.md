@@ -2,7 +2,7 @@
 
 This project is a golang library for applications wanting to talk to a BOSH/MicroBOSH or bosh-lite.
 
-( ![baby-gopher](https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png) )[http://www.babygopher.com]
+<a href='http://www.babygopher.com'><img src='https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png' ></a>
 
 ## API compatibility
 
