@@ -2,6 +2,8 @@
 
 This project is a golang library for applications wanting to talk to a BOSH/MicroBOSH or bosh-lite.
 
+( ![baby-gopher](https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png) )[http://www.babygopher.com]
+
 ## API compatibility
 
 The BOSH Core team nor its Product Managers have never claimed that a BOSH director has a public API; and they want to make changes to the API in the future. I have no idea how to support a future, un-documented, un-versioned API. It'll be tricky.
