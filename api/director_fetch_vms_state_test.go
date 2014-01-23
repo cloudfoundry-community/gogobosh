@@ -36,23 +36,23 @@ var _ = Describe("parse full vms task output", func() {
 			taskOutputRequest)
 		defer ts.Close()
 
-		vm_statuses, apiResponse := repo.FetchVMsStatus("cf-warden")
+		vmStatuses, apiResponse := repo.FetchVMsStatus("cf-warden")
 
-		/* TODO convert vm_statuses to a chan and pluck first item from chan */
-		Expect(len(vm_statuses)).To(Equal(2))
-		vm_status := vm_statuses[0]
-		Expect(vm_status.JobName).To(Equal("hm9000_z1"))
-		Expect(vm_status.Index).To(Equal(0))
-		Expect(vm_status.JobState).To(Equal("running"))
-		Expect(vm_status.VMCid).To(Equal("vm-a1a3d634-367d-4b75-940c-ef7742a970d9"))
-		Expect(vm_status.AgentID).To(Equal("c0da6161-e66f-4910-a0eb-dc6fc19b4b25"))
-		Expect(vm_status.ResourcePool).To(Equal("medium_z1"))
-		Expect(vm_status.ResurrectionPaused).To(Equal(false))
+		/* TODO convert vmStatuses to a chan and pluck first item from chan */
+		Expect(len(vmStatuses)).To(Equal(2))
+		vmStatus := vmStatuses[0]
+		Expect(vmStatus.JobName).To(Equal("hm9000_z1"))
+		Expect(vmStatus.Index).To(Equal(0))
+		Expect(vmStatus.JobState).To(Equal("running"))
+		Expect(vmStatus.VMCid).To(Equal("vm-a1a3d634-367d-4b75-940c-ef7742a970d9"))
+		Expect(vmStatus.AgentID).To(Equal("c0da6161-e66f-4910-a0eb-dc6fc19b4b25"))
+		Expect(vmStatus.ResourcePool).To(Equal("medium_z1"))
+		Expect(vmStatus.ResurrectionPaused).To(Equal(false))
 
-		Expect(len(vm_status.IPs)).To(Equal(1))
-		Expect(vm_status.IPs[0]).To(Equal("10.244.1.14"))
+		Expect(len(vmStatus.IPs)).To(Equal(1))
+		Expect(vmStatus.IPs[0]).To(Equal("10.244.1.14"))
 
-		Expect(len(vm_status.DNSs)).To(Equal(0))
+		Expect(len(vmStatus.DNSs)).To(Equal(0))
 
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
