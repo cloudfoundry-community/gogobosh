@@ -4,9 +4,26 @@ This project is a golang library for applications wanting to talk to a BOSH/Micr
 
 <a href='http://www.babygopher.com'><img src='https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png' ></a>
 
-## API compatibility
+## API
 
-The BOSH Core team nor its Product Managers have never claimed that a BOSH director has a public API; and they want to make changes to the API in the future. I have no idea how to support a future, un-documented, un-versioned API. It'll be tricky.
+The following client functions are available, as a subset of the full BOSH Director API.
+
+* repo.GetInfo()
+* repo.GetStemcells()
+* repo.DeleteStemcell("bosh-stemcell", "993")
+* repo.GetReleases()
+* repo.DeleteReleases("cf")
+* repo.DeleteRelease("cf", "144")
+* repo.GetDeployments()
+* repo.ListDeploymentVMs("cf-warden")
+* repo.FetchVMsStatus("cf-warden")
+* repo.GetTaskStatus(123)
+
+### API compatibility
+
+Note: Development is currently being done against bosh-lite v147.
+
+The BOSH Core team nor its Product Managers do not claim that a BOSH director has a public API; and they want to make changes to the API in the future. It will may be tricky for golang apps to support different BOSH APIs. We'll figure this out as we go.
 
 The best way to describe the API support in this library is to document what version of bosh-lite is being tested against, the date that it was published. Hopefully bosh-lite is always approximately parallel (via rebasing) in its API with the main BOSH project; and the same timestamps can map to the continuously delivered releases of BOSH & its RubyGems.
 
@@ -22,15 +39,27 @@ go get github.com/cloudfoundry-community/gogobosh
 
 ### Use
 
+There is an extensive [example application](https://github.com/cloudfoundry-community/gogobosh/blob/master/example/bosh-lite-example.go) showing usage of many of the read-only functions.
+
+As a short getting started guide:
+
 ``` golang
 package main
 
 import (
   "github.com/cloudfoundry-community/gogobosh"
   "fmt"
+	"flag"
 )
 
 func main() {
+	gogobosh.Logger = gogobosh.NewLogger()
+
+	target := flag.String("target", "https://192.168.50.4:25555", "BOSH director host")
+	username := flag.String("username", "admin", "Login with username")
+	password := flag.String("password", "admin", "Login with password")
+	flag.Parse()
+
   director := gogobosh.NewDirector(*target, *username, *password)
   repo := gogobosh.NewBoshDirectorRepository(&director, gogobosh.NewDirectorGateway())
 
