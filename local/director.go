@@ -1,6 +1,7 @@
 package local
 
 import (
+	"errors"
 	"io/ioutil"
 
 	"launchpad.net/goyaml"
@@ -14,7 +15,7 @@ type BoshConfig struct {
 	Version        string `yaml:"target_version"`
 	UUID           string `yaml:"target_uuid"`
 	Aliases        map[string]map[string]string
-	Authentication map[string]authentication `yaml:"auth"`
+	Authentication map[string]*authentication `yaml:"auth"`
 }
 
 type authentication struct {
@@ -35,6 +36,13 @@ func LoadBoshConfig(configPath string) (config *BoshConfig, err error) {
 }
 
 // CurrentBoshTarget returns the connection information for local user's current target BOSH
-func (config *BoshConfig) CurrentBoshTarget() (target, username, password string) {
-	return "", "", ""
+func (config *BoshConfig) CurrentBoshTarget() (target, username, password string, err error) {
+	if config.Target == "" {
+		return "", "", "", errors.New("Please target a BOSH first. Run 'bosh target DIRECTOR_IP'.")
+	}
+	auth := config.Authentication[config.Target]
+	if auth == nil {
+		return "", "", "", errors.New("Current target has not been authenticated yet. Run 'bosh login'.")
+	}
+	return config.Target, auth.Username, auth.Password, nil
 }
