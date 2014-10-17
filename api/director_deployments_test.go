@@ -1,11 +1,12 @@
 package api_test
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/cloudfoundry-community/gogobosh/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"fmt"
 )
 
 var _ = Describe("Deployments", func() {
@@ -52,6 +53,26 @@ var _ = Describe("Deployments", func() {
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
 	})
 
+	It("GetDeployment(name) - get deployment, including manifest", func() {
+		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
+			Method: "GET",
+			Path:   "/deployments/cf-warden",
+			Response: testhelpers.TestResponse{
+				Status: http.StatusOK,
+				Body: `{
+					"manifest": "TODO"
+				}`,
+			}})
+		ts, handler, repo := createDirectorRepo(request)
+		defer ts.Close()
+
+		rawManifest, apiResponse := repo.GetDeploymentManifest("cf-warden")
+		Expect(apiResponse.IsSuccessful()).To(Equal(true))
+		Expect(handler.AllRequestsCalled()).To(Equal(true))
+
+		Expect(rawManifest).To(Equal("TODO"))
+	})
+
 	It("DeleteDeployment(name) forcefully", func() {
 		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "DELETE",
@@ -59,7 +80,7 @@ var _ = Describe("Deployments", func() {
 			Response: testhelpers.TestResponse{
 				Status: http.StatusFound,
 				Header: http.Header{
-					"Location":{"https://some.host/tasks/20"},
+					"Location": {"https://some.host/tasks/20"},
 				},
 			}})
 		ts, handler, repo := createDirectorRepo(
@@ -78,7 +99,7 @@ var _ = Describe("Deployments", func() {
 })
 
 // Shared helper for asserting that a /tasks/ID is requested and returns a gogobosh.TaskStatus response
-func taskTestRequest(taskID int, state string) (testhelpers.TestRequest) {
+func taskTestRequest(taskID int, state string) testhelpers.TestRequest {
 	baseJSON := `{
 	  "id": %d,
 	  "state": "%s",

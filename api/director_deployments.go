@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"time"
+
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
@@ -24,6 +25,20 @@ func (repo BoshDirectorRepository) GetDeployments() (deployments []gogobosh.Depl
 	return
 }
 
+// GetDeploymentManifest returns a raw deployment manifest
+func (repo BoshDirectorRepository) GetDeploymentManifest(deploymentName string) (manifest string, apiResponse net.ApiResponse) {
+	deploymentManifestResponse := deploymentManifestResponse{}
+
+	path := fmt.Sprintf("/deployments/%s", deploymentName)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &deploymentManifestResponse)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	return deploymentManifestResponse.RawManifest, apiResponse
+}
+
+// DeleteDeployment asks the director to delete a deployment
 func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/deployments/%s?force=true", deploymentName)
 	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
@@ -59,13 +74,17 @@ func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiR
 }
 
 type deploymentResponse struct {
-	Name string             `json:"name"`
-	Releases []nameVersion  `json:"deployments"`
+	Name      string        `json:"name"`
+	Releases  []nameVersion `json:"deployments"`
 	Stemcells []nameVersion `json:"stemcells"`
 }
 
+type deploymentManifestResponse struct {
+	RawManifest string `json:"manifest"`
+}
+
 type nameVersion struct {
-	Name string    `json:"name"`
+	Name    string `json:"name"`
 	Version string `json:"version"`
 }
 
