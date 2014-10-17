@@ -17,7 +17,7 @@ type DirectorRepository interface {
 	DeleteRelease(name string, version string) (apiResponse net.ApiResponse)
 
 	GetDeployments() (deployments []gogobosh.Deployment, apiResponse net.ApiResponse)
-	GetDeploymentManifest(deploymentName string) (manifest string, apiResponse net.ApiResponse)
+	GetDeploymentManifest(deploymentName string) (manifest *gogobosh.DeploymentManifest, apiResponse net.ApiResponse)
 	DeleteDeployment(deploymentName string) (apiResponse net.ApiResponse)
 	ListDeploymentVMs(deploymentName string) (deploymentVMs []gogobosh.DeploymentVM, apiResponse net.ApiResponse)
 	FetchVMsStatus(deploymentName string) (vmsStatus []gogobosh.VMStatus, apiResponse net.ApiResponse)

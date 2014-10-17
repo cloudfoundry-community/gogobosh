@@ -5,10 +5,13 @@ import (
 	"net/url"
 	"time"
 
+	"launchpad.net/goyaml"
+
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
+// GetDeployments returns a list of deployments, and the releases/stemcells being used
 func (repo BoshDirectorRepository) GetDeployments() (deployments []gogobosh.Deployment, apiResponse net.ApiResponse) {
 	deploymentsResponse := []deploymentResponse{}
 
@@ -25,8 +28,8 @@ func (repo BoshDirectorRepository) GetDeployments() (deployments []gogobosh.Depl
 	return
 }
 
-// GetDeploymentManifest returns a raw deployment manifest
-func (repo BoshDirectorRepository) GetDeploymentManifest(deploymentName string) (manifest string, apiResponse net.ApiResponse) {
+// GetDeploymentManifest returns a deployment manifest
+func (repo BoshDirectorRepository) GetDeploymentManifest(deploymentName string) (manifest *gogobosh.DeploymentManifest, apiResponse net.ApiResponse) {
 	deploymentManifestResponse := deploymentManifestResponse{}
 
 	path := fmt.Sprintf("/deployments/%s", deploymentName)
@@ -35,7 +38,7 @@ func (repo BoshDirectorRepository) GetDeploymentManifest(deploymentName string) 
 		return
 	}
 
-	return deploymentManifestResponse.RawManifest, apiResponse
+	return deploymentManifestResponse.ToModel(), apiResponse
 }
 
 // DeleteDeployment asks the director to delete a deployment
@@ -89,7 +92,6 @@ type nameVersion struct {
 }
 
 func (resource deploymentResponse) ToModel() (deployment gogobosh.Deployment) {
-	deployment = gogobosh.Deployment{}
 	deployment.Name = resource.Name
 	for _, releaseResponse := range resource.Releases {
 		release := gogobosh.NameVersion{}
@@ -106,5 +108,12 @@ func (resource deploymentResponse) ToModel() (deployment gogobosh.Deployment) {
 
 		deployment.Stemcells = append(deployment.Stemcells, stemcell)
 	}
+	return
+}
+
+// ToModel converts a GetDeploymentManifest API response into gogobosh.DeploymentManifest
+func (resource deploymentManifestResponse) ToModel() (manifest *gogobosh.DeploymentManifest) {
+	manifest = &gogobosh.DeploymentManifest{}
+	goyaml.Unmarshal([]byte(resource.RawManifest), manifest)
 	return
 }

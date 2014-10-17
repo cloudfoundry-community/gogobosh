@@ -1,14 +1,15 @@
 package api_test
 
 import (
+	"net/http"
+	"net/http/httptest"
+
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/cloudfoundry-community/gogobosh/api"
 	"github.com/cloudfoundry-community/gogobosh/net"
 	"github.com/cloudfoundry-community/gogobosh/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
 )
 
 var _ = Describe("get director info", func() {
@@ -46,17 +47,17 @@ var _ = Describe("get director info", func() {
 		defer ts.Close()
 
 		info, apiResponse := repo.GetInfo()
-		
-		Expect(info.Name                           ).To(Equal("Bosh Lite Director"))
-		Expect(info.UUID                           ).To(Equal("bd462a15-213d-448c-aa5b-66624dad3f0e"))
-		Expect(info.Version                        ).To(Equal("1.5.0.pre.1657 (14bc162c)"))
-		Expect(info.User                           ).To(Equal("admin"))
-		Expect(info.CPI                            ).To(Equal("warden"))
-		Expect(info.DNSEnabled                     ).To(Equal(false))
-		Expect(info.DNSDomainName                  ).To(Equal("bosh"))
-		Expect(info.CompiledPackageCacheEnabled    ).To(Equal(true))
-		Expect(info.CompiledPackageCacheProvider   ).To(Equal("local"))
-		Expect(info.SnapshotsEnabled               ).To(Equal(false))
+
+		Expect(info.Name).To(Equal("Bosh Lite Director"))
+		Expect(info.UUID).To(Equal("bd462a15-213d-448c-aa5b-66624dad3f0e"))
+		Expect(info.Version).To(Equal("1.5.0.pre.1657 (14bc162c)"))
+		Expect(info.User).To(Equal("admin"))
+		Expect(info.CPI).To(Equal("warden"))
+		Expect(info.DNSEnabled).To(Equal(false))
+		Expect(info.DNSDomainName).To(Equal("bosh"))
+		Expect(info.CompiledPackageCacheEnabled).To(Equal(true))
+		Expect(info.CompiledPackageCacheProvider).To(Equal("local"))
+		Expect(info.SnapshotsEnabled).To(Equal(false))
 
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
@@ -74,4 +75,3 @@ func createDirectorRepo(reqs ...testhelpers.TestRequest) (ts *httptest.Server, h
 	repo = api.NewBoshDirectorRepository(config, gateway)
 	return
 }
-

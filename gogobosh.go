@@ -51,6 +51,11 @@ type Deployment struct {
 	Stemcells []NameVersion
 }
 
+// DeploymentManifest describes all the configuration for any BOSH deployment
+type DeploymentManifest struct {
+	Name string
+}
+
 // DeploymentVM describes the association of a running server
 // within a Deployment
 type DeploymentVM struct {

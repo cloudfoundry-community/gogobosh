@@ -41,13 +41,13 @@ var _ = Describe("Deployments", func() {
 		deployment := deployments[0]
 		Expect(deployment.Name).To(Equal("cf-warden"))
 
-		deployment_release := deployment.Releases[0]
-		Expect(deployment_release.Name).To(Equal("cf"))
-		Expect(deployment_release.Version).To(Equal("153"))
+		deploymentRelease := deployment.Releases[0]
+		Expect(deploymentRelease.Name).To(Equal("cf"))
+		Expect(deploymentRelease.Version).To(Equal("153"))
 
-		deployment_stemcell := deployment.Stemcells[0]
-		Expect(deployment_stemcell.Name).To(Equal("bosh-stemcell"))
-		Expect(deployment_stemcell.Version).To(Equal("993"))
+		deploymentStemcell := deployment.Stemcells[0]
+		Expect(deploymentStemcell.Name).To(Equal("bosh-stemcell"))
+		Expect(deploymentStemcell.Version).To(Equal("993"))
 
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
@@ -60,17 +60,17 @@ var _ = Describe("Deployments", func() {
 			Response: testhelpers.TestResponse{
 				Status: http.StatusOK,
 				Body: `{
-					"manifest": "TODO"
+					"manifest": "name: cf-warden"
 				}`,
 			}})
 		ts, handler, repo := createDirectorRepo(request)
 		defer ts.Close()
 
-		rawManifest, apiResponse := repo.GetDeploymentManifest("cf-warden")
+		manifest, apiResponse := repo.GetDeploymentManifest("cf-warden")
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
 
-		Expect(rawManifest).To(Equal("TODO"))
+		Expect(manifest.Name).To(Equal("cf-warden"))
 	})
 
 	It("DeleteDeployment(name) forcefully", func() {
