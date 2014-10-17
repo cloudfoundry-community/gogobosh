@@ -68,8 +68,8 @@ type manifestJobNetwork struct {
 	StaticIPs *[]string `yaml:"static_ips"`
 }
 
-// FindJobTemplates returns the subnet of ManifestJobs that include a specific job template
-func (manifest *DeploymentManifest) FindJobTemplates(jobTemplateName string) (jobs []*ManifestJob) {
+// FindByJobTemplates returns the subnet of ManifestJobs that include a specific job template
+func (manifest *DeploymentManifest) FindByJobTemplates(jobTemplateName string) (jobs []*ManifestJob) {
 	jobs = []*ManifestJob{}
 	for _, job := range manifest.Jobs {
 		for _, jobTemplate := range job.JobTemplates {

@@ -8,7 +8,7 @@ import (
 )
 
 var _ = Describe("DeploymentManifest", func() {
-	It("FindJobTemplates", func() {
+	It("FindByJobTemplates", func() {
 		manifest := &models.DeploymentManifest{
 			Jobs: []*models.ManifestJob{
 				{Name: "job1", JobTemplates: []*models.ManifestJobTemplate{{Name: "common"}}},
@@ -16,7 +16,7 @@ var _ = Describe("DeploymentManifest", func() {
 				{Name: "other", JobTemplates: []*models.ManifestJobTemplate{{Name: "other"}}},
 			},
 		}
-		jobs := manifest.FindJobTemplates("common")
+		jobs := manifest.FindByJobTemplates("common")
 		Expect(len(jobs)).To(Equal(2))
 	})
 })
