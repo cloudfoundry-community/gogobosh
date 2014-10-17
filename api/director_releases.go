@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
+// GetReleases returns the list of releases, and versions available
 func (repo BoshDirectorRepository) GetReleases() (releases []models.Release, apiResponse net.ApiResponse) {
 	releasesResponse := []releaseResponse{}
 
@@ -25,6 +26,7 @@ func (repo BoshDirectorRepository) GetReleases() (releases []models.Release, api
 	return
 }
 
+// DeleteReleases deletes all versions of a release from the BOSH director
 func (repo BoshDirectorRepository) DeleteReleases(name string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/releases/%s?force=true", name)
 	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
@@ -59,6 +61,7 @@ func (repo BoshDirectorRepository) DeleteReleases(name string) (apiResponse net.
 	return
 }
 
+// DeleteRelease deletes a specific version of a release from the BOSH director
 func (repo BoshDirectorRepository) DeleteRelease(name string, version string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/releases/%s?force=true&version=%s", name, version)
 	apiResponse = repo.gateway.DeleteResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password)
