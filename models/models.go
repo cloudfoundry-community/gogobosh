@@ -49,26 +49,6 @@ type ReleaseVersion struct {
 	CurrentlyDeployed  bool
 }
 
-// Deployments is a collection of deployments in the Director
-type Deployments []*Deployment
-
-// Deployment describes a running BOSH deployment and the
-// Releases and Stemcells it is using.
-type Deployment struct {
-	Name      string
-	Releases  []NameVersion
-	Stemcells []NameVersion
-}
-
-// DeploymentVM describes the association of a running server
-// within a Deployment
-type DeploymentVM struct {
-	JobName string
-	Index   int
-	VMCid   string
-	AgentID string
-}
-
 // NameVersion is a reusable structure for Name/Version information
 type NameVersion struct {
 	Name    string
