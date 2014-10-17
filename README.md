@@ -106,7 +106,8 @@ import (
 
 func main() {
   configPath, err := local.DefaultBoshConfigPath()
-  target, username, password, err := local.CurrentBoshTarget()
+  config, err := local.LoadBoshConfig(configPath)
+  target, username, password, err := config.CurrentBoshTarget()
   director := gogobosh.NewDirector(target, username, password)
 ```
 
