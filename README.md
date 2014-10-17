@@ -94,6 +94,22 @@ func main() {
 }
 ```
 
+You can automatically detect the current director target, and username/password, from the BOSH CLI's `~/.bosh_config` file as well (see `example/current_target.go`)
+
+```golang
+package main
+
+import (
+  "github.com/cloudfoundry-community/gogobosh"
+  "github.com/cloudfoundry-community/gogobosh/local"
+)
+
+func main() {
+  configPath, err := local.DefaultBoshConfigPath()
+  target, username, password, err := local.CurrentBoshTarget()
+  director := gogobosh.NewDirector(target, username, password)
+```
+
 ## Tests
 
 Tests are all local currently; and do not test against a running bosh or bosh-lite. I'd like to at least do integration tests against a bosh-lite in future.

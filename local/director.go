@@ -3,6 +3,8 @@ package local
 import (
 	"errors"
 	"io/ioutil"
+	"os/user"
+	"path/filepath"
 
 	"launchpad.net/goyaml"
 )
@@ -33,6 +35,15 @@ func LoadBoshConfig(configPath string) (config *BoshConfig, err error) {
 	}
 	goyaml.Unmarshal(contents, config)
 	return
+}
+
+// DefaultBoshConfigPath returns the path to ~/.bosh_config
+func DefaultBoshConfigPath() (configPath string, err error) {
+	usr, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Abs(usr.HomeDir + "/.bosh_config")
 }
 
 // CurrentBoshTarget returns the connection information for local user's current target BOSH
