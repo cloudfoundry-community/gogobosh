@@ -10,18 +10,20 @@ import (
 )
 
 // GetReleases returns the list of releases, and versions available
-func (repo BoshDirectorRepository) GetReleases() (releases []models.Release, apiResponse net.ApiResponse) {
-	releasesResponse := []releaseResponse{}
+func (repo BoshDirectorRepository) GetReleases() (releases models.Releases, apiResponse net.ApiResponse) {
+	response := []releaseResponse{}
 
 	path := "/releases"
-	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &releasesResponse)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &response)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, resource := range releasesResponse {
-		releases = append(releases, resource.ToModel())
+	list := []*models.Release{}
+	for _, resource := range response {
+		list = append(list, resource.ToModel())
 	}
+	releases = models.Releases(list)
 
 	return
 }
@@ -108,8 +110,8 @@ type releaseVersionResponse struct {
 	CurrentlyDeployed  bool   `json:"currently_deployed"`
 }
 
-func (resource releaseResponse) ToModel() (release models.Release) {
-	release = models.Release{}
+func (resource releaseResponse) ToModel() (release *models.Release) {
+	release = &models.Release{}
 	release.Name = resource.Name
 	for _, versionResponse := range resource.Versions {
 		version := models.ReleaseVersion{}

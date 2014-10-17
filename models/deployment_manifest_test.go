@@ -18,6 +18,5 @@ var _ = Describe("DeploymentManifest", func() {
 		}
 		jobs := manifest.FindJobTemplates("common")
 		Expect(len(jobs)).To(Equal(2))
-
 	})
 })

@@ -12,18 +12,20 @@ import (
 )
 
 // GetDeployments returns a list of deployments, and the releases/stemcells being used
-func (repo BoshDirectorRepository) GetDeployments() (deployments []models.Deployment, apiResponse net.ApiResponse) {
-	deploymentsResponse := []deploymentResponse{}
+func (repo BoshDirectorRepository) GetDeployments() (deployments models.Deployments, apiResponse net.ApiResponse) {
+	response := []deploymentResponse{}
 
 	path := "/deployments"
-	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &deploymentsResponse)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &response)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, resource := range deploymentsResponse {
-		deployments = append(deployments, resource.ToModel())
+	list := []*models.Deployment{}
+	for _, resource := range response {
+		list = append(list, resource.ToModel())
 	}
+	deployments = models.Deployments(list)
 
 	return
 }
@@ -91,7 +93,8 @@ type nameVersion struct {
 	Version string `json:"version"`
 }
 
-func (resource deploymentResponse) ToModel() (deployment models.Deployment) {
+func (resource deploymentResponse) ToModel() (deployment *models.Deployment) {
+	deployment = &models.Deployment{}
 	deployment.Name = resource.Name
 	for _, releaseResponse := range resource.Releases {
 		release := models.NameVersion{}

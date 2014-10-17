@@ -22,12 +22,18 @@ type DirectorInfo struct {
 	SnapshotsEnabled             bool
 }
 
+// Stemcells is a collection of stemcell in the Director
+type Stemcells []*Stemcell
+
 // Stemcell describes an available versioned stemcell
 type Stemcell struct {
 	Name    string
 	Version string
 	Cid     string
 }
+
+// Releases is a collection of releases in the Director
+type Releases []*Release
 
 // Release describes a release and all available versions
 type Release struct {
@@ -42,6 +48,9 @@ type ReleaseVersion struct {
 	UncommittedChanges bool
 	CurrentlyDeployed  bool
 }
+
+// Deployments is a collection of deployments in the Director
+type Deployments []*Deployment
 
 // Deployment describes a running BOSH deployment and the
 // Releases and Stemcells it is using.

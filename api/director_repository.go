@@ -9,14 +9,14 @@ import (
 type DirectorRepository interface {
 	GetInfo() (directorInfo models.DirectorInfo, apiResponse net.ApiResponse)
 
-	GetStemcells() (stemcells []models.Stemcell, apiResponse net.ApiResponse)
+	GetStemcells() (stemcells models.Stemcells, apiResponse net.ApiResponse)
 	DeleteStemcell(name string, version string) (apiResponse net.ApiResponse)
 
-	GetReleases() (releases []models.Release, apiResponse net.ApiResponse)
+	GetReleases() (releases models.Releases, apiResponse net.ApiResponse)
 	DeleteReleases(name string) (apiResponse net.ApiResponse)
 	DeleteRelease(name string, version string) (apiResponse net.ApiResponse)
 
-	GetDeployments() (deployments []models.Deployment, apiResponse net.ApiResponse)
+	GetDeployments() (deployments models.Deployments, apiResponse net.ApiResponse)
 	GetDeploymentManifest(deploymentName string) (manifest *models.DeploymentManifest, apiResponse net.ApiResponse)
 	DeleteDeployment(deploymentName string) (apiResponse net.ApiResponse)
 	ListDeploymentVMs(deploymentName string) (deploymentVMs []models.DeploymentVM, apiResponse net.ApiResponse)
