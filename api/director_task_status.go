@@ -2,11 +2,12 @@ package api
 
 import (
 	"fmt"
-	"github.com/cloudfoundry-community/gogobosh"
+
+	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) GetTaskStatuses() (tasks []gogobosh.TaskStatus, apiResponse net.ApiResponse) {
+func (repo BoshDirectorRepository) GetTaskStatuses() (tasks []models.TaskStatus, apiResponse net.ApiResponse) {
 	taskResponses := []taskStatusResponse{}
 
 	path := fmt.Sprintf("/tasks")
@@ -22,7 +23,7 @@ func (repo BoshDirectorRepository) GetTaskStatuses() (tasks []gogobosh.TaskStatu
 	return
 }
 
-func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task gogobosh.TaskStatus, apiResponse net.ApiResponse) {
+func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task models.TaskStatus, apiResponse net.ApiResponse) {
 	taskResponse := taskStatusResponse{}
 
 	path := fmt.Sprintf("/tasks/%d", taskID)
@@ -37,16 +38,16 @@ func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task gogobosh.Task
 }
 
 type taskStatusResponse struct {
-	ID int             `json:"id"`
-	State string       `json:"state"`
+	ID          int    `json:"id"`
+	State       string `json:"state"`
 	Description string `json:"description"`
-	TimeStamp int      `json:"timestamp"`
-	Result string      `json:"result"`
-	User string        `json:"user"`
+	TimeStamp   int    `json:"timestamp"`
+	Result      string `json:"result"`
+	User        string `json:"user"`
 }
 
-func (resource taskStatusResponse) ToModel() (task gogobosh.TaskStatus) {
-	task = gogobosh.TaskStatus{}
+func (resource taskStatusResponse) ToModel() (task models.TaskStatus) {
+	task = models.TaskStatus{}
 
 	task.ID = resource.ID
 	task.State = resource.State

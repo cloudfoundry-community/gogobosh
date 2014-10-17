@@ -2,11 +2,12 @@ package api
 
 import (
 	"fmt"
-	"github.com/cloudfoundry-community/gogobosh"
+
+	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) ListDeploymentVMs(deploymentName string) (deploymentVMs []gogobosh.DeploymentVM, apiResponse net.ApiResponse) {
+func (repo BoshDirectorRepository) ListDeploymentVMs(deploymentName string) (deploymentVMs []models.DeploymentVM, apiResponse net.ApiResponse) {
 	resources := []deploymentVMResponse{}
 
 	path := fmt.Sprintf("/deployments/%s/vms", deploymentName)
@@ -23,18 +24,18 @@ func (repo BoshDirectorRepository) ListDeploymentVMs(deploymentName string) (dep
 }
 
 type deploymentVMResponse struct {
-	JobName string  `json:"job"`
-	Index int       `json:"index"`
-	VMCid string    `json:"cid"`
-	AgentID string  `json:"agent_id"`
+	JobName string `json:"job"`
+	Index   int    `json:"index"`
+	VMCid   string `json:"cid"`
+	AgentID string `json:"agent_id"`
 }
 
-func (resource deploymentVMResponse) ToModel() (vm gogobosh.DeploymentVM) {
-	vm = gogobosh.DeploymentVM{}
-	vm.JobName  = resource.JobName
-	vm.Index    = resource.Index
-	vm.VMCid    = resource.VMCid
-	vm.AgentID  = resource.AgentID
+func (resource deploymentVMResponse) ToModel() (vm models.DeploymentVM) {
+	vm = models.DeploymentVM{}
+	vm.JobName = resource.JobName
+	vm.Index = resource.Index
+	vm.VMCid = resource.VMCid
+	vm.AgentID = resource.AgentID
 
 	return
 }

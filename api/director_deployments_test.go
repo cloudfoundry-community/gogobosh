@@ -98,7 +98,7 @@ var _ = Describe("Deployments", func() {
 	})
 })
 
-// Shared helper for asserting that a /tasks/ID is requested and returns a gogobosh.TaskStatus response
+// Shared helper for asserting that a /tasks/ID is requested and returns a models.TaskStatus response
 func taskTestRequest(taskID int, state string) testhelpers.TestRequest {
 	baseJSON := `{
 	  "id": %d,

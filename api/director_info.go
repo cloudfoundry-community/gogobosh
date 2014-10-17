@@ -1,11 +1,11 @@
 package api
 
 import (
-	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) GetInfo() (directorInfo gogobosh.DirectorInfo, apiResponse net.ApiResponse) {
+func (repo BoshDirectorRepository) GetInfo() (directorInfo models.DirectorInfo, apiResponse net.ApiResponse) {
 	infoResource := directorInfoResponse{}
 
 	path := "/info"
@@ -20,22 +20,22 @@ func (repo BoshDirectorRepository) GetInfo() (directorInfo gogobosh.DirectorInfo
 }
 
 type directorInfoResponse struct {
-	Name string          `json:"name"`
-	UUID string          `json:"uuid"`
-	Version string       `json:"version"`
-	User string          `json:"user"`
-	CPI string           `json:"cpi"`
+	Name     string                       `json:"name"`
+	UUID     string                       `json:"uuid"`
+	Version  string                       `json:"version"`
+	User     string                       `json:"user"`
+	CPI      string                       `json:"cpi"`
 	Features directorInfoFeaturesResponse `json:"features"`
 }
 
 type directorInfoFeaturesResponse struct {
-	DNS directorInfoFeaturesDNS                                   `json:"dns"`
+	DNS                  directorInfoFeaturesDNS                  `json:"dns"`
 	CompiledPackageCache directorInfoFeaturesCompiledPackageCache `json:"compiled_package_cache"`
-	Snapshots directorInfoFeaturesSnapshots                       `json:"snapshots"`
+	Snapshots            directorInfoFeaturesSnapshots            `json:"snapshots"`
 }
 
 type directorInfoFeaturesDNS struct {
-	Status bool                       `json:"status"`
+	Status bool                          `json:"status"`
 	Extras directorInfoFeaturesDNSExtras `json:"extras"`
 }
 
@@ -44,7 +44,7 @@ type directorInfoFeaturesDNSExtras struct {
 }
 
 type directorInfoFeaturesCompiledPackageCache struct {
-	Status bool                                        `json:"status"`
+	Status bool                                           `json:"status"`
 	Extras directorInfoFeaturesCompiledPackageCacheExtras `json:"extras"`
 }
 
@@ -56,8 +56,8 @@ type directorInfoFeaturesSnapshots struct {
 	Status bool `json:"status"`
 }
 
-func (resource directorInfoResponse) ToModel() (director gogobosh.DirectorInfo) {
-	director = gogobosh.DirectorInfo{}
+func (resource directorInfoResponse) ToModel() (director models.DirectorInfo) {
+	director = models.DirectorInfo{}
 	director.Name = resource.Name
 	director.Version = resource.Version
 	director.User = resource.User

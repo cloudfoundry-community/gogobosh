@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/url"
 	"time"
-	"github.com/cloudfoundry-community/gogobosh"
+
+	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) GetReleases() (releases []gogobosh.Release, apiResponse net.ApiResponse) {
+func (repo BoshDirectorRepository) GetReleases() (releases []models.Release, apiResponse net.ApiResponse) {
 	releasesResponse := []releaseResponse{}
 
 	path := "/releases"
@@ -34,7 +35,7 @@ func (repo BoshDirectorRepository) DeleteReleases(name string) (apiResponse net.
 		return
 	}
 
-	var taskStatus gogobosh.TaskStatus
+	var taskStatus models.TaskStatus
 	taskURL, err := url.Parse(apiResponse.RedirectLocation)
 	if err != nil {
 		return
@@ -68,7 +69,7 @@ func (repo BoshDirectorRepository) DeleteRelease(name string, version string) (a
 		return
 	}
 
-	var taskStatus gogobosh.TaskStatus
+	var taskStatus models.TaskStatus
 	taskURL, err := url.Parse(apiResponse.RedirectLocation)
 	if err != nil {
 		return
@@ -93,22 +94,22 @@ func (repo BoshDirectorRepository) DeleteRelease(name string, version string) (a
 }
 
 type releaseResponse struct {
-	Name string                       `json:"name"`
+	Name     string                   `json:"name"`
 	Versions []releaseVersionResponse `json:"release_versions"`
 }
 
 type releaseVersionResponse struct {
-	Version string          `json:"version"`
-	CommitHash string       `json:"commit_hash"`
-	UncommittedChanges bool `json:"uncommitted_changes"`
-	CurrentlyDeployed bool  `json:"currently_deployed"`
+	Version            string `json:"version"`
+	CommitHash         string `json:"commit_hash"`
+	UncommittedChanges bool   `json:"uncommitted_changes"`
+	CurrentlyDeployed  bool   `json:"currently_deployed"`
 }
 
-func (resource releaseResponse) ToModel() (release gogobosh.Release) {
-	release = gogobosh.Release{}
+func (resource releaseResponse) ToModel() (release models.Release) {
+	release = models.Release{}
 	release.Name = resource.Name
 	for _, versionResponse := range resource.Versions {
-		version := gogobosh.ReleaseVersion{}
+		version := models.ReleaseVersion{}
 		version.Version = versionResponse.Version
 		version.CommitHash = versionResponse.CommitHash
 		version.UncommittedChanges = versionResponse.UncommittedChanges

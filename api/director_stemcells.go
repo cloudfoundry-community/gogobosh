@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/url"
 	"time"
-	"github.com/cloudfoundry-community/gogobosh"
+
+	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) GetStemcells() (stemcells []gogobosh.Stemcell, apiResponse net.ApiResponse) {
+func (repo BoshDirectorRepository) GetStemcells() (stemcells []models.Stemcell, apiResponse net.ApiResponse) {
 	stemcellsResponse := []stemcellResponse{}
 
 	path := "/stemcells"
@@ -34,7 +35,7 @@ func (repo BoshDirectorRepository) DeleteStemcell(name string, version string) (
 		return
 	}
 
-	var taskStatus gogobosh.TaskStatus
+	var taskStatus models.TaskStatus
 	taskURL, err := url.Parse(apiResponse.RedirectLocation)
 	if err != nil {
 		return
@@ -59,13 +60,13 @@ func (repo BoshDirectorRepository) DeleteStemcell(name string, version string) (
 }
 
 type stemcellResponse struct {
-	Name string    `json:"name"`
+	Name    string `json:"name"`
 	Version string `json:"version"`
-	Cid string     `json:"cid"`
+	Cid     string `json:"cid"`
 }
 
-func (resource stemcellResponse) ToModel() (stemcell gogobosh.Stemcell) {
-	stemcell = gogobosh.Stemcell{}
+func (resource stemcellResponse) ToModel() (stemcell models.Stemcell) {
+	stemcell = models.Stemcell{}
 	stemcell.Name = resource.Name
 	stemcell.Version = resource.Version
 	stemcell.Cid = resource.Cid

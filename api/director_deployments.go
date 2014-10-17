@@ -7,12 +7,12 @@ import (
 
 	"launchpad.net/goyaml"
 
-	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
 // GetDeployments returns a list of deployments, and the releases/stemcells being used
-func (repo BoshDirectorRepository) GetDeployments() (deployments []gogobosh.Deployment, apiResponse net.ApiResponse) {
+func (repo BoshDirectorRepository) GetDeployments() (deployments []models.Deployment, apiResponse net.ApiResponse) {
 	deploymentsResponse := []deploymentResponse{}
 
 	path := "/deployments"
@@ -29,7 +29,7 @@ func (repo BoshDirectorRepository) GetDeployments() (deployments []gogobosh.Depl
 }
 
 // GetDeploymentManifest returns a deployment manifest
-func (repo BoshDirectorRepository) GetDeploymentManifest(deploymentName string) (manifest *gogobosh.DeploymentManifest, apiResponse net.ApiResponse) {
+func (repo BoshDirectorRepository) GetDeploymentManifest(deploymentName string) (manifest *models.DeploymentManifest, apiResponse net.ApiResponse) {
 	deploymentManifestResponse := deploymentManifestResponse{}
 
 	path := fmt.Sprintf("/deployments/%s", deploymentName)
@@ -52,7 +52,7 @@ func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiR
 		return
 	}
 
-	var taskStatus gogobosh.TaskStatus
+	var taskStatus models.TaskStatus
 	taskURL, err := url.Parse(apiResponse.RedirectLocation)
 	if err != nil {
 		return
@@ -91,10 +91,10 @@ type nameVersion struct {
 	Version string `json:"version"`
 }
 
-func (resource deploymentResponse) ToModel() (deployment gogobosh.Deployment) {
+func (resource deploymentResponse) ToModel() (deployment models.Deployment) {
 	deployment.Name = resource.Name
 	for _, releaseResponse := range resource.Releases {
-		release := gogobosh.NameVersion{}
+		release := models.NameVersion{}
 		release.Name = releaseResponse.Name
 		release.Version = releaseResponse.Version
 
@@ -102,7 +102,7 @@ func (resource deploymentResponse) ToModel() (deployment gogobosh.Deployment) {
 	}
 
 	for _, stemcellResponse := range resource.Stemcells {
-		stemcell := gogobosh.NameVersion{}
+		stemcell := models.NameVersion{}
 		stemcell.Name = stemcellResponse.Name
 		stemcell.Version = stemcellResponse.Version
 
@@ -111,9 +111,9 @@ func (resource deploymentResponse) ToModel() (deployment gogobosh.Deployment) {
 	return
 }
 
-// ToModel converts a GetDeploymentManifest API response into gogobosh.DeploymentManifest
-func (resource deploymentManifestResponse) ToModel() (manifest *gogobosh.DeploymentManifest) {
-	manifest = &gogobosh.DeploymentManifest{}
+// ToModel converts a GetDeploymentManifest API response into models.DeploymentManifest
+func (resource deploymentManifestResponse) ToModel() (manifest *models.DeploymentManifest) {
+	manifest = &models.DeploymentManifest{}
 	goyaml.Unmarshal([]byte(resource.RawManifest), manifest)
 	return
 }

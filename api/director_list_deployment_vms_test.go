@@ -8,7 +8,7 @@ import (
 )
 
 var _ = Describe("simple list of vms", func() {
-	It("GET /deployments/$name/vms to return []gogobosh.DeploymentVM{}", func() {
+	It("GET /deployments/$name/vms to return []models.DeploymentVM{}", func() {
 		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "GET",
 			Path:   "/deployments/cf-warden/vms",

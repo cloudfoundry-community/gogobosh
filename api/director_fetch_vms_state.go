@@ -1,22 +1,23 @@
 package api
 
 import (
-	"fmt"
-	"time"
-	"strings"
 	"encoding/json"
-	"github.com/cloudfoundry-community/gogobosh"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
-func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsStatuses []gogobosh.VMStatus, apiResponse net.ApiResponse) {
-	var taskStatus gogobosh.TaskStatus
+func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsStatuses []models.VMStatus, apiResponse net.ApiResponse) {
+	var taskStatus models.TaskStatus
 
 	/*
 	* Two API calls
 	* 1. GET /deployments/%s/vms?format=full and be redirected to a /tasks/123
-	* 2. Streaming GET on /tasks/123/output?type=result - each line is a gogobosh.VMStatus
-	*/
+	* 2. Streaming GET on /tasks/123/output?type=result - each line is a models.VMStatus
+	 */
 	path := fmt.Sprintf("/deployments/%s/vms?format=full", deploymentName)
 	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &taskStatus)
 	if apiResponse.IsNotSuccessful() {
@@ -60,30 +61,30 @@ func (repo BoshDirectorRepository) FetchVMsStatus(deploymentName string) (vmsSta
 }
 
 type vmStatusResponse struct {
-	JobName string  `json:"job_name"`
-	Index int       `json:"index"`
-	JobState string `json:"job_state"`
-	VMCid string    `json:"vm_cid"`
-	AgentID string  `json:"agent_id"`
-	IPs []string    `json:"ips"`
-	DNSs []string   `json:"dns"`
-	ResourcePool string     `json:"resource_pool"`
-	ResurrectionPaused bool `json:"resurrection_paused"`
-	Vitals vitalsResponse `json:"vitals"`
+	JobName            string         `json:"job_name"`
+	Index              int            `json:"index"`
+	JobState           string         `json:"job_state"`
+	VMCid              string         `json:"vm_cid"`
+	AgentID            string         `json:"agent_id"`
+	IPs                []string       `json:"ips"`
+	DNSs               []string       `json:"dns"`
+	ResourcePool       string         `json:"resource_pool"`
+	ResurrectionPaused bool           `json:"resurrection_paused"`
+	Vitals             vitalsResponse `json:"vitals"`
 }
 
 type vitalsResponse struct {
-	Load []string            `json:"load"`
-	CPU cpuResponse          `json:"cpu"`
+	Load   []string          `json:"load"`
+	CPU    cpuResponse       `json:"cpu"`
 	Memory percentKbResponse `json:"mem"`
-	Swap percentKbResponse   `json:"swap"`
-	Disk diskResponse        `json:"disk"`
+	Swap   percentKbResponse `json:"swap"`
+	Disk   diskResponse      `json:"disk"`
 }
 
 type cpuResponse struct {
-	User float64    `json:"user,string"`
-	System float64  `json:"sys,string"`
-	Wait float64    `json:"wait,string"`
+	User   float64 `json:"user,string"`
+	System float64 `json:"sys,string"`
+	Wait   float64 `json:"wait,string"`
 }
 
 type diskResponse struct {
@@ -92,16 +93,16 @@ type diskResponse struct {
 
 type percentKbResponse struct {
 	Percent float64 `json:"percent,string"`
-	Kb int          `json:"kb,string"`
+	Kb      int     `json:"kb,string"`
 }
 
-func (resource vmStatusResponse) ToModel() (status gogobosh.VMStatus) {
-	status = gogobosh.VMStatus{}
-	status.JobName  = resource.JobName
-	status.Index    = resource.Index
+func (resource vmStatusResponse) ToModel() (status models.VMStatus) {
+	status = models.VMStatus{}
+	status.JobName = resource.JobName
+	status.Index = resource.Index
 	status.JobState = resource.JobState
-	status.VMCid    = resource.VMCid
-	status.AgentID  = resource.AgentID
+	status.VMCid = resource.VMCid
+	status.AgentID = resource.AgentID
 	status.ResourcePool = resource.ResourcePool
 	status.ResurrectionPaused = resource.ResurrectionPaused
 

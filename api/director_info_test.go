@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/cloudfoundry-community/gogobosh/api"
+	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
 	"github.com/cloudfoundry-community/gogobosh/testhelpers"
 	. "github.com/onsi/ginkgo"
@@ -66,7 +66,7 @@ var _ = Describe("get director info", func() {
 
 func createDirectorRepo(reqs ...testhelpers.TestRequest) (ts *httptest.Server, handler *testhelpers.TestHandler, repo api.DirectorRepository) {
 	ts, handler = testhelpers.NewTLSServer(reqs)
-	config := &gogobosh.Director{
+	config := &models.Director{
 		TargetURL: ts.URL,
 		Username:  "admin",
 		Password:  "admin",

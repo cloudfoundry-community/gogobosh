@@ -7,8 +7,8 @@ import (
 	"net/http"
 )
 
-var _ = Describe("gogobosh.TaskStatus", func() {
-	It("GetTaskStatus returns gogobosh.TaskStatus{}", func() {
+var _ = Describe("models.TaskStatus", func() {
+	It("GetTaskStatus returns models.TaskStatus{}", func() {
 		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "GET",
 			Path:   "/tasks/1",
@@ -38,7 +38,7 @@ var _ = Describe("gogobosh.TaskStatus", func() {
 		Expect(handler.AllRequestsCalled()).To(Equal(true))
 	})
 
-	It("() returns []gogobosh.TaskStatus{}", func() {
+	It("() returns []models.TaskStatus{}", func() {
 		request := testhelpers.NewDirectorTestRequest(testhelpers.TestRequest{
 			Method: "GET",
 			Path:   "/tasks",

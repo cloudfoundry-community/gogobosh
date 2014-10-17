@@ -75,7 +75,7 @@ func main() {
   password := flag.String("password", "admin", "Login with password")
   flag.Parse()
 
-  director := gogobosh.NewDirector(*target, *username, *password)
+  director := models.NewDirector(*target, *username, *password)
   repo := api.NewBoshDirectorRepository(&director, net.NewDirectorGateway())
 
   info, apiResponse := repo.GetInfo()

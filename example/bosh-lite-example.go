@@ -1,12 +1,13 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/cloudfoundry-community/gogobosh/api"
 	"github.com/cloudfoundry-community/gogobosh/net"
 	"github.com/cloudfoundry-community/gogobosh/utils"
-	"fmt"
-	"flag"
 )
 
 func main() {
