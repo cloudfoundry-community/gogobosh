@@ -80,7 +80,7 @@ func (repo BoshDirectorRepository) DeleteDeployment(deploymentName string) (apiR
 
 type deploymentResponse struct {
 	Name      string        `json:"name"`
-	Releases  []nameVersion `json:"deployments"`
+	Releases  []nameVersion `json:"releases"`
 	Stemcells []nameVersion `json:"stemcells"`
 }
 

@@ -19,7 +19,7 @@ var _ = Describe("Deployments", func() {
 				Body: `[
 				  {
 				    "name": "cf-warden",
-				    "deployments": [
+				    "releases": [
 				      {
 				        "name": "cf",
 				        "version": "153"
