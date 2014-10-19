@@ -46,12 +46,12 @@ type manifestResourcePool struct {
 // ManifestJob describes a cluster of VMs each running the same set of job templates
 type ManifestJob struct {
 	Name             string
-	JobTemplates     []*ManifestJobTemplate
-	Instances        int             `yaml:"instances,omitempty"`
-	ResourcePoolName string          `yaml:"resource_pool"`
-	PersistentDisk   int             `yaml:"persistent_disk,omitempty"`
-	Lifecycle        string          `yaml:"lifecycle,omitempty"`
-	Update           *manifestUpdate `yaml:"update"`
+	JobTemplates     []*ManifestJobTemplate `yaml:"templates"`
+	Instances        int                    `yaml:"instances,omitempty"`
+	ResourcePoolName string                 `yaml:"resource_pool"`
+	PersistentDisk   int                    `yaml:"persistent_disk,omitempty"`
+	Lifecycle        string                 `yaml:"lifecycle,omitempty"`
+	Update           *manifestUpdate        `yaml:"update"`
 	Networks         []*manifestJobNetwork
 	Properties       *map[string]interface{} `yaml:"properties"`
 }
