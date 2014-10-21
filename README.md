@@ -4,7 +4,9 @@ This project is a golang library for applications wanting to talk to a BOSH/Micr
 
 <a href='http://www.babygopher.com'><img src='https://raw2.github.com/drnic/babygopher-site/gh-pages/images/babygopher-badge.png' ></a>
 
-[![GoDoc](https://godoc.org/github.com/cloudfoundry-community/gogobosh?status.png)](https://godoc.org/github.com/cloudfoundry-community/gogobosh)
+* [![GoDoc](https://godoc.org/github.com/cloudfoundry-community/gogobosh?status.png)](https://godoc.org/github.com/cloudfoundry-community/gogobosh)
+* Test status [![Build Status](https://travis-ci.org/cloudfoundry-community/gogobosh.svg)](https://travis-ci.org/cloudfoundry-community/gogobosh)
+
 
 ## API
 
