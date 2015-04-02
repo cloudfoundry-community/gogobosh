@@ -18,6 +18,7 @@ type BoshConfig struct {
 	UUID           string `yaml:"target_uuid"`
 	Aliases        map[string]map[string]string
 	Authentication map[string]*authentication `yaml:"auth"`
+	Deployments    map[string]string          `yaml:"deployment"`
 }
 
 type authentication struct {
@@ -56,4 +57,9 @@ func (config *BoshConfig) CurrentBoshTarget() (target, username, password string
 		return "", "", "", errors.New("Current target has not been authenticated yet. Run 'bosh login'.")
 	}
 	return config.Target, auth.Username, auth.Password, nil
+}
+
+// CurrentDeploymentManifest returns the path to the deployment manifest for the currently target BOSH
+func (config *BoshConfig) CurrentDeploymentManifest() (manifestPath string) {
+	return config.Deployments[config.Target]
 }
