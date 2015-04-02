@@ -8,5 +8,4 @@ install:
   - godep restore
 
 script:
-  - go test
-  - test -z "$(go fmt ./...)"
+  - ginkgo -r
