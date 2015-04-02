@@ -37,7 +37,7 @@ var _ = Describe("get list of stemcells", func() {
 
 		stemcells, apiResponse := repo.GetStemcells()
 		stemcell := stemcells[0]
-		
+
 		Expect(stemcell.Name).To(Equal("bosh-stemcell"))
 		Expect(stemcell.Version).To(Equal("993"))
 		Expect(stemcell.Cid).To(Equal("stemcell-6e6b9689-8b03-42cd-a6de-7784e3c421ec"))
@@ -53,7 +53,7 @@ var _ = Describe("get list of stemcells", func() {
 			Response: testhelpers.TestResponse{
 				Status: http.StatusFound,
 				Header: http.Header{
-					"Location":{"https://some.host/tasks/24"},
+					"Location": {"https://some.host/tasks/24"},
 				},
 			}})
 		ts, handler, repo := createDirectorRepo(

@@ -15,7 +15,7 @@ var _ = Describe("parse full vms task output", func() {
 			Response: testhelpers.TestResponse{
 				Status: http.StatusFound,
 				Header: http.Header{
-					"Location":{"https://some.host/tasks/12"},
+					"Location": {"https://some.host/tasks/12"},
 				},
 			},
 		})

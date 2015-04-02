@@ -75,7 +75,7 @@ var _ = Describe("get list of releases", func() {
 			Response: testhelpers.TestResponse{
 				Status: http.StatusFound,
 				Header: http.Header{
-					"Location":{"https://some.host/tasks/25"},
+					"Location": {"https://some.host/tasks/25"},
 				},
 			}})
 		ts, handler, repo := createDirectorRepo(
@@ -99,7 +99,7 @@ var _ = Describe("get list of releases", func() {
 			Response: testhelpers.TestResponse{
 				Status: http.StatusFound,
 				Header: http.Header{
-					"Location":{"https://some.host/tasks/26"},
+					"Location": {"https://some.host/tasks/26"},
 				},
 			}})
 		ts, handler, repo := createDirectorRepo(

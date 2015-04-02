@@ -26,7 +26,7 @@ var _ = Describe("models.TaskStatus", func() {
 		defer ts.Close()
 
 		task, apiResponse := repo.GetTaskStatus(1)
-		
+
 		Expect(task.ID).To(Equal(1))
 		Expect(task.State).To(Equal("done"))
 		Expect(task.Description).To(Equal("create release"))
@@ -83,7 +83,7 @@ var _ = Describe("models.TaskStatus", func() {
 	// verbose: true/false - show internal tasks
 
 	// limit: nil or integer limit
-	
+
 	// states: all, processing,cancelling,queued ("running"), or specific list
 	XIt("GetRunningTaskStatuses", func() {
 		// states: processing,cancelling,queued

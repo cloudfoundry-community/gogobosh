@@ -16,6 +16,6 @@ var _ = Describe("Gateway", func() {
 		Expect(apiResponse.IsSuccessful()).To(Equal(true))
 		Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("Basic YWRtaW46YWRtaW4="))
 		Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
-		Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("gogobosh "+constants.Version+" / "+runtime.GOOS))
+		Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("gogobosh " + constants.Version + " / " + runtime.GOOS))
 	})
 })

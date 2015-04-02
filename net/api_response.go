@@ -6,13 +6,13 @@ import (
 )
 
 type ApiResponse struct {
-	Message    string
-	ErrorCode  string
-	StatusCode int
+	Message          string
+	ErrorCode        string
+	StatusCode       int
 	RedirectLocation string
 
-	isError    bool
-	isNotFound bool
+	isError       bool
+	isNotFound    bool
 	isRedirection bool
 }
 

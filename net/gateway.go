@@ -1,9 +1,10 @@
 package net
 
 import (
-	"encoding/json"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"github.com/cloudfoundry-community/gogobosh/constants"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -11,7 +12,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-	"github.com/cloudfoundry-community/gogobosh/constants"
 )
 
 const (
@@ -50,7 +50,7 @@ type Request struct {
 }
 
 type Gateway struct {
-	errHandler      errorHandler
+	errHandler errorHandler
 }
 
 func newGateway(errHandler errorHandler) (gateway Gateway) {
@@ -114,7 +114,7 @@ func (gateway Gateway) NewRequest(method, path, username string, password string
 	}
 
 	if password != "" {
-		data := []byte(username+":"+password)
+		data := []byte(username + ":" + password)
 		auth := base64.StdEncoding.EncodeToString(data)
 		request.Header.Set("Authorization", "Basic "+auth)
 	}

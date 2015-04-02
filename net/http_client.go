@@ -4,11 +4,11 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/cloudfoundry-community/gogobosh/utils"
 	"net/http"
 	"net/http/httputil"
 	"regexp"
 	"strings"
-	"github.com/cloudfoundry-community/gogobosh/utils"
 )
 
 const (
