@@ -39,8 +39,8 @@ type manifestNetwork struct {
 type manifestResourcePool struct {
 	Name            string
 	NetworkName     string `yaml:"network"`
-	Stemcell        string
-	CloudProperties string `yaml:"cloud_properties"`
+	Stemcell        *manifestStemcell
+	CloudProperties *map[string]interface{} `yaml:"cloud_properties"`
 }
 
 // ManifestJob describes a cluster of VMs each running the same set of job templates
@@ -66,6 +66,11 @@ type manifestJobNetwork struct {
 	Name      string
 	Default   *[]string `yaml:"default"`
 	StaticIPs *[]string `yaml:"static_ips"`
+}
+
+type manifestStemcell struct {
+	Name    string
+	Version string
 }
 
 // FindByJobTemplates returns the subnet of ManifestJobs that include a specific job template
