@@ -47,13 +47,13 @@ type manifestResourcePool struct {
 type ManifestJob struct {
 	Name             string
 	JobTemplates     []*ManifestJobTemplate `yaml:"templates"`
-	Instances        int                    `yaml:"instances,omitempty"`
+	Instances        int                    `yaml:"instances"`
 	ResourcePoolName string                 `yaml:"resource_pool"`
 	PersistentDisk   int                    `yaml:"persistent_disk,omitempty"`
 	Lifecycle        string                 `yaml:"lifecycle,omitempty"`
-	Update           *manifestUpdate        `yaml:"update"`
+	Update           *manifestUpdate        `yaml:"update,omitempty"`
 	Networks         []*manifestJobNetwork
-	Properties       *map[string]interface{} `yaml:"properties"`
+	Properties       *map[string]interface{} `yaml:"properties,omitempty"`
 }
 
 // ManifestJobTemplate describes a job template included in a ManifestJob
@@ -64,8 +64,8 @@ type ManifestJobTemplate struct {
 
 type manifestJobNetwork struct {
 	Name      string
-	Default   *[]string `yaml:"default"`
-	StaticIPs *[]string `yaml:"static_ips"`
+	Default   *[]string `yaml:"default,omitempty"`
+	StaticIPs *[]string `yaml:"static_ips,omitempty"`
 }
 
 type manifestStemcell struct {
