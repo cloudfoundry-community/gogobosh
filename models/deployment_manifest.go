@@ -2,7 +2,7 @@ package models
 
 // DeploymentManifest describes all the configuration for any BOSH deployment
 type DeploymentManifest struct {
-	Meta          map[string]interface{}
+	Meta          map[string]interface{} `yaml:"meta,omitempty"`
 	Name          string
 	DirectorUUID  string `yaml:"director_uuid"`
 	Releases      []*NameVersion
@@ -11,7 +11,7 @@ type DeploymentManifest struct {
 	Networks      []*manifestNetwork
 	ResourcePools []*manifestResourcePool `yaml:"resource_pools"`
 	Jobs          []*ManifestJob
-	Properties    *map[string]interface{}
+	Properties    *map[string]interface{} `yaml:"properties,omitempty"`
 }
 
 type manifestCompilation struct {
