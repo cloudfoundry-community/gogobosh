@@ -6,7 +6,7 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"launchpad.net/goyaml"
+	"gopkg.in/yaml.v2"
 )
 
 // BoshConfig describes a local ~/.bosh_config file
@@ -34,7 +34,7 @@ func LoadBoshConfig(configPath string) (config *BoshConfig, err error) {
 	if err != nil {
 		return config, err
 	}
-	goyaml.Unmarshal(contents, config)
+	yaml.Unmarshal(contents, config)
 	return
 }
 
