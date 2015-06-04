@@ -5,6 +5,7 @@ go: 1.4.2
 install:
   - export PATH=$PATH:$HOME/gopath/bin
   - go get github.com/onsi/ginkgo/ginkgo
+  - go get gopkg.in/yaml.v2
   - go get github.com/tools/godep
   - godep restore
 

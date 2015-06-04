@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"time"
 
-	"launchpad.net/goyaml"
+	"gopkg.in/yaml.v2"
 
 	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
@@ -117,6 +117,6 @@ func (resource deploymentResponse) ToModel() (deployment *models.Deployment) {
 // ToModel converts a GetDeploymentManifest API response into models.DeploymentManifest
 func (resource deploymentManifestResponse) ToModel() (manifest *models.DeploymentManifest) {
 	manifest = &models.DeploymentManifest{}
-	goyaml.Unmarshal([]byte(resource.RawManifest), manifest)
+	yaml.Unmarshal([]byte(resource.RawManifest), manifest)
 	return
 }
