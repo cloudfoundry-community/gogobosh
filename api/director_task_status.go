@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry-community/gogobosh/net"
 )
 
+// GetTaskStatuses returns a list of most recent task statuses
 func (repo BoshDirectorRepository) GetTaskStatuses() (tasks []models.TaskStatus, apiResponse net.ApiResponse) {
 	taskResponses := []taskStatusResponse{}
 
@@ -23,6 +24,24 @@ func (repo BoshDirectorRepository) GetTaskStatuses() (tasks []models.TaskStatus,
 	return
 }
 
+// GetTaskStatusesWithLimit returns a max of 'limit' task statuses
+func (repo BoshDirectorRepository) GetTaskStatusesWithLimit(limit int) (tasks []models.TaskStatus, apiResponse net.ApiResponse) {
+	taskResponses := []taskStatusResponse{}
+
+	path := fmt.Sprintf("/tasks?limit=%d", limit)
+	apiResponse = repo.gateway.GetResource(repo.config.TargetURL+path, repo.config.Username, repo.config.Password, &taskResponses)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	for _, resource := range taskResponses {
+		tasks = append(tasks, resource.ToModel())
+	}
+
+	return
+}
+
+// GetTaskStatus returns details of a specific task to allow polling for state change
 func (repo BoshDirectorRepository) GetTaskStatus(taskID int) (task models.TaskStatus, apiResponse net.ApiResponse) {
 	taskResponse := taskStatusResponse{}
 

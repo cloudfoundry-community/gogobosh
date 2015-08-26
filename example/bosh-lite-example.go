@@ -82,7 +82,15 @@ func main() {
 		fmt.Println("")
 	}
 
-	task, apiResponse := repo.GetTaskStatus(1)
+	tasks, apiResponse := repo.GetTaskStatusesWithLimit(3)
+	if apiResponse.IsNotSuccessful() {
+		fmt.Println("Could not fetch tasks")
+		return
+	} else {
+		fmt.Printf("%#v\n", tasks)
+	}
+
+	task, apiResponse := repo.GetTaskStatus(tasks[0].ID)
 	if apiResponse.IsNotSuccessful() {
 		fmt.Println("Could not fetch BOSH task 1")
 		return
