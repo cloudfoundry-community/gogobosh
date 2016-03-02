@@ -41,6 +41,9 @@ func PrepareRedirect(req *http.Request, via []*http.Request) error {
 	req.Header.Set("Content-Type", prevReq.Header.Get("Content-Type"))
 	req.Header.Set("User-Agent", prevReq.Header.Get("User-Agent"))
 
+	// For some reason, BOSH rejects (403) redirects with a Referer header
+	req.Header.Del("Referer")
+
 	dumpRequest(req)
 
 	return nil

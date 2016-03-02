@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"time"
 
-	"launchpad.net/goyaml"
+	goyaml "gopkg.in/yaml.v2"
 
 	"github.com/cloudfoundry-community/gogobosh/models"
 	"github.com/cloudfoundry-community/gogobosh/net"
