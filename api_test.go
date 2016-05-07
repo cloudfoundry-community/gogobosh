@@ -3,7 +3,7 @@ package gogobosh_test
 import (
 	"net/http"
 
-	. "github.com/cloudfoundry-community/boshclient"
+	. "github.com/cloudfoundry-community/gogobosh"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
