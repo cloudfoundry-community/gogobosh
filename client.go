@@ -119,19 +119,19 @@ func (c *Client) GetInfo() (info Info, err error) {
 
 	if err != nil {
 		log.Printf("Error requesting info %v", err)
-		return info, err
+		return
 	}
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading info request %v", resBody)
-		return info, err
+		return
 	}
 	err = json.Unmarshal(resBody, &info)
 	if err != nil {
 		log.Printf("Error unmarshaling info %v", err)
-		return info, err
+		return
 	}
-	return info, nil
+	return
 }
 
 // toHTTP converts the request to an HTTP request
