@@ -45,7 +45,7 @@ func DefaultConfig() *Config {
 		Username:          "admin",
 		Password:          "admin",
 		HttpClient:        http.DefaultClient,
-		SkipSslValidation: false,
+		SkipSslValidation: true,
 	}
 }
 
