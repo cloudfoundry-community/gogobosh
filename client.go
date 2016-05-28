@@ -112,6 +112,12 @@ func (c *Client) DoRequest(r *request) (*http.Response, error) {
 	return resp, err
 }
 
+// UUID return uuid
+func (c *Client) UUID() string {
+	info, _ := c.GetInfo()
+	return info.UUID
+}
+
 // GetInfo returns BOSH Info
 func (c *Client) GetInfo() (info Info, err error) {
 	r := c.NewRequest("GET", "/info")
