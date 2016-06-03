@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -107,16 +108,14 @@ func (c *Client) DeleteDeployment(name string) (task Task, err error) {
 		log.Printf("Error requesting deleting deployment %v", err)
 		return
 	}
-	resBody, err := ioutil.ReadAll(resp.Body)
+	url, _ := resp.Location()
+	re, _ := regexp.Compile(`(\d+)$`)
+	stringId := re.FindStringSubmatch(url.Path)
+	id, err := strconv.Atoi(stringId[0])
 	if err != nil {
-		log.Printf("Error reading deleting deployment request %v", resBody)
 		return
 	}
-	err = json.Unmarshal(resBody, &task)
-	if err != nil {
-		log.Printf("Error unmarshaling tasks %v", err)
-		return
-	}
+	task, err = c.GetTask(id)
 	return
 }
 
