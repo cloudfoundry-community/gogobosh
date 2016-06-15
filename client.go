@@ -21,7 +21,6 @@ type Client struct {
 //Config is used to configure the creation of a client
 type Config struct {
 	BOSHAddress       string
-	Port              string
 	Username          string
 	Password          string
 	HttpClient        *http.Client
