@@ -161,11 +161,12 @@ func getInfo(api string, httpClient *http.Client) (*Info, error) {
 	}
 
 	resp, err := httpClient.Get(api + "/info")
-
 	if err != nil {
 		log.Printf("Error requesting info %v", err)
 		return &Info{}, err
 	}
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading info request %v", resBody)
@@ -225,6 +226,8 @@ func (c *Client) GetInfo() (info Info, err error) {
 		log.Printf("Error requesting info %v", err)
 		return
 	}
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading info request %v", resBody)

@@ -15,6 +15,7 @@ import (
 func (c *Client) GetStemcells() (stemcells []Stemcell, err error) {
 	r := c.NewRequest("GET", "/stemcells")
 	resp, err := c.DoRequest(r)
+	defer resp.Body.Close()
 
 	if err != nil {
 		log.Printf("Error requesting stemcells  %v", err)
@@ -42,6 +43,8 @@ func (c *Client) GetReleases() (releases []Release, err error) {
 		log.Printf("Error requesting releases  %v", err)
 		return
 	}
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading releases request %v", resBody)
@@ -64,6 +67,8 @@ func (c *Client) GetDeployments() (deployments []Deployment, err error) {
 		log.Printf("Error requesting deployments  %v", err)
 		return
 	}
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading deployments request %v", resBody)
@@ -86,6 +91,8 @@ func (c *Client) GetDeployment(name string) (manifest Manifest, err error) {
 		log.Printf("Error requesting deployment manifest %v", err)
 		return
 	}
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading deployment manifest request %v", resBody)
@@ -108,6 +115,7 @@ func (c *Client) DeleteDeployment(name string) (task Task, err error) {
 		log.Printf("Error requesting deleting deployment %v", err)
 		return
 	}
+	defer resp.Body.Close()
 	url, _ := resp.Location()
 	re, _ := regexp.Compile(`(\d+)$`)
 	stringId := re.FindStringSubmatch(url.Path)
@@ -127,10 +135,13 @@ func (c *Client) CreateDeployment(manifest string) (task Task, err error) {
 	r.header["Content-Type"] = "text/yaml"
 
 	resp, err := c.DoRequest(r)
+
 	if err != nil {
 		log.Printf("Error requesting create deployment %v", err)
 		return
 	}
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading task request %v", resBody)
@@ -149,10 +160,12 @@ func (c *Client) GetDeploymentVMs(name string) (vms []VM, err error) {
 	var task Task
 	r := c.NewRequest("GET", "/deployments/"+name+"/vms?format=full")
 	resp, err := c.DoRequest(r)
+
 	if err != nil {
 		log.Printf("Error requesting deployment vms %v", err)
 		return
 	}
+	defer resp.Body.Close()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -198,6 +211,9 @@ func (c *Client) GetTasks() (tasks []Task, err error) {
 		log.Printf("Error requesting tasks  %v", err)
 		return
 	}
+
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading tasks request %v", resBody)
@@ -221,6 +237,8 @@ func (c *Client) GetTask(id int) (task Task, err error) {
 		log.Printf("Error requesting task %v", err)
 		return
 	}
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading task request %v", resBody)
@@ -243,6 +261,8 @@ func (c *Client) GetTaskResult(id int) (output []string) {
 	if err != nil {
 		log.Printf("Error requesting task %v", err)
 	}
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading task request %v", resBody)
