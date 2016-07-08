@@ -12,8 +12,10 @@ type Info struct {
 
 // UserAuthenication struct
 type UserAuthenication struct {
-	Type    string      `json:"type"`
-	Options interface{} `json:"options"`
+	Type    string `json:"type"`
+	Options struct {
+		URL string `json:"url"`
+	} `json:"options"`
 }
 
 // Stemcell struct

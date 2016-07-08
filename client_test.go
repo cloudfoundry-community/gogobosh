@@ -21,7 +21,7 @@ var _ = Describe("Client", func() {
 		})
 	})
 
-	Describe("Test Creating client", func() {
+	Describe("Test Creating basic auth client", func() {
 		var server *ghttp.Server
 		var client *Client
 
@@ -39,7 +39,7 @@ var _ = Describe("Client", func() {
 				User:    "admin",
 				CPI:     "warden_cpi",
 			}
-			client = NewClient(config)
+			client, _ = NewClient(config)
 
 			server.AppendHandlers(
 				ghttp.CombineHandlers(
@@ -59,6 +59,62 @@ var _ = Describe("Client", func() {
 			Expect(info.CPI).Should(Equal("warden_cpi"))
 
 			Expect(err).Should(BeNil())
+		})
+	})
+
+	Describe("Test Creating uaa auth client", func() {
+		var client *Client
+
+		BeforeEach(func() {
+			setup(MockRoute{"GET", "/stemcells", `{}`})
+			config := &Config{
+				BOSHAddress: server.URL,
+				Username:    "admin",
+				Password:    "admin",
+				UAAAuth:     true,
+			}
+
+			client, _ = NewClient(config)
+		})
+
+		AfterEach(func() {
+			teardown()
+		})
+
+		It("can get bosh info", func() {
+			info, err := client.GetInfo()
+			Expect(info.Name).Should(Equal("bosh-lite"))
+			Expect(info.UUID).Should(Equal("2daf673a-9755-4b4f-aa6d-3632fbed8012"))
+			Expect(info.Version).Should(Equal("1.3126.0 (00000000)"))
+			Expect(info.User).Should(Equal("admin"))
+			Expect(info.CPI).Should(Equal("warden_cpi"))
+
+			Expect(err).Should(BeNil())
+		})
+	})
+
+	Describe("Test uaa auth", func() {
+		var client *Client
+
+		BeforeEach(func() {
+			setup(MockRoute{"GET", "/stemcells", `{}`})
+			config := &Config{
+				BOSHAddress: server.URL,
+				Username:    "admin",
+				Password:    "admin",
+				UAAAuth:     true,
+			}
+			client, _ = NewClient(config)
+		})
+
+		AfterEach(func() {
+			teardown()
+		})
+
+		It("can refresh its uaa token", func() {
+			token, err := client.GetToken()
+			Expect(err).Should(BeNil())
+			Consistently(token).Should(Equal("bearer foobar2"))
 		})
 	})
 })

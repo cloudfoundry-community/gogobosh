@@ -22,7 +22,7 @@ var _ = Describe("Api", func() {
 				Username:    "admin",
 				Password:    "admin",
 			}
-			client = NewClient(config)
+			client, _ = NewClient(config)
 		})
 
 		AfterEach(func() {

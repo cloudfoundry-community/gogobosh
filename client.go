@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,7 +17,8 @@ import (
 
 //Client used to communicate with BOSH
 type Client struct {
-	config Config
+	config   Config
+	Endpoint Endpoint
 }
 
 //Config is used to configure the creation of a client
@@ -24,8 +27,14 @@ type Config struct {
 	Port              string
 	Username          string
 	Password          string
+	UAAAuth           bool
 	HttpClient        *http.Client
 	SkipSslValidation bool
+	TokenSource       oauth2.TokenSource
+}
+
+type Endpoint struct {
+	URL string `json:"doppler_logging_endpoint"`
 }
 
 // request is used to help build up a request
@@ -49,8 +58,14 @@ func DefaultConfig() *Config {
 	}
 }
 
+func DefaultEndpoint() *Endpoint {
+	return &Endpoint{
+		URL: "https://192.168.50.4:8443",
+	}
+}
+
 // NewClient returns a new client
-func NewClient(config *Config) *Client {
+func NewClient(config *Config) (*Client, error) {
 	// bootstrap the config
 	defConfig := DefaultConfig()
 
@@ -66,24 +81,88 @@ func NewClient(config *Config) *Client {
 		config.Password = defConfig.Password
 	}
 
-	config.HttpClient = &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: config.SkipSslValidation,
+	endpoint := &Endpoint{}
+	if !config.UAAAuth {
+		config.HttpClient = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: config.SkipSslValidation,
+				},
 			},
-		},
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			if len(via) > 10 {
-				return fmt.Errorf("stopped after 10 redirects")
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				if len(via) > 10 {
+					return fmt.Errorf("stopped after 10 redirects")
+				}
+				req.URL.Host = strings.TrimPrefix(config.BOSHAddress, req.URL.Scheme+"://")
+				req.SetBasicAuth(config.Username, config.Password)
+				return nil
+			},
+		}
+	} else {
+		ctx := oauth2.NoContext
+		if config.SkipSslValidation == false {
+			ctx = context.WithValue(ctx, oauth2.HTTPClient, defConfig.HttpClient)
+		} else {
+			tr := &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			}
-			req.URL.Host = strings.TrimPrefix(config.BOSHAddress, req.URL.Scheme+"://")
-			req.SetBasicAuth(config.Username, config.Password)
-			return nil
-		}}
-	client := &Client{
-		config: *config,
+			ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{Transport: tr})
+		}
+
+		endpoint, err := getUAAEndpoint(config.BOSHAddress, oauth2.NewClient(ctx, nil))
+
+		if err != nil {
+			return nil, fmt.Errorf("Could not get api /info: %v", err)
+		}
+
+		authConfig := &oauth2.Config{
+			ClientID: "cf",
+			Scopes:   []string{""},
+			Endpoint: oauth2.Endpoint{
+				AuthURL:  endpoint.URL + "/oauth/auth",
+				TokenURL: endpoint.URL + "/oauth/token",
+			},
+		}
+
+		token, err := authConfig.PasswordCredentialsToken(ctx, config.Username, config.Password)
+		if err != nil {
+			return nil, fmt.Errorf("Error getting token: %v", err)
+		}
+
+		config.TokenSource = authConfig.TokenSource(ctx, token)
+		config.HttpClient = oauth2.NewClient(ctx, config.TokenSource)
 	}
-	return client
+	client := &Client{
+		config:   *config,
+		Endpoint: *endpoint,
+	}
+
+	return client, nil
+}
+
+func getUAAEndpoint(api string, httpClient *http.Client) (*Endpoint, error) {
+	var (
+		info Info
+	)
+
+	if api == "" {
+		return DefaultEndpoint(), nil
+	}
+
+	resp, err := httpClient.Get(api + "/info")
+
+	if err != nil {
+		log.Printf("Error requesting info %v", err)
+		return &Endpoint{}, err
+	}
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Error reading info request %v", resBody)
+		return &Endpoint{}, err
+	}
+	err = json.Unmarshal(resBody, &info)
+	URL := info.UserAuthenication.Options.URL
+	return &Endpoint{URL: URL}, err
 }
 
 // NewRequest is used to create a new request
@@ -154,6 +233,14 @@ func (r *request) toHTTP() (*http.Request, error) {
 
 	// Create the HTTP request
 	return http.NewRequest(r.method, r.url, r.body)
+}
+
+func (c *Client) GetToken() (string, error) {
+	token, err := c.config.TokenSource.Token()
+	if err != nil {
+		return "", fmt.Errorf("Error getting bearer token: %v", err)
+	}
+	return "bearer " + token.AccessToken, nil
 }
 
 // decodeBody is used to JSON decode a body
