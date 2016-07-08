@@ -82,13 +82,19 @@ func NewClient(config *Config) (*Client, error) {
 	}
 
 	endpoint := &Endpoint{}
-	if !config.UAAAuth {
-		config.HttpClient = &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: config.SkipSslValidation,
-				},
+	config.HttpClient = &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: config.SkipSslValidation,
 			},
+		},
+	}
+	authType, err := getAuthType(config.BOSHAddress, config.HttpClient)
+	if err != nil {
+		return nil, fmt.Errorf("Could not get auth type: %v", err)
+	}
+	if authType != "uaa" {
+		config.HttpClient = &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				if len(via) > 10 {
 					return fmt.Errorf("stopped after 10 redirects")
@@ -140,27 +146,40 @@ func NewClient(config *Config) (*Client, error) {
 	return client, nil
 }
 
-func getUAAEndpoint(api string, httpClient *http.Client) (*Endpoint, error) {
+func getAuthType(api string, httpClient *http.Client) (string, error) {
+	info, err := getInfo(api, httpClient)
+	return info.UserAuthenication.Type, err
+}
+
+func getInfo(api string, httpClient *http.Client) (*Info, error) {
 	var (
 		info Info
 	)
 
 	if api == "" {
-		return DefaultEndpoint(), nil
+		return &Info{}, nil
 	}
 
 	resp, err := httpClient.Get(api + "/info")
 
 	if err != nil {
 		log.Printf("Error requesting info %v", err)
-		return &Endpoint{}, err
+		return &Info{}, err
 	}
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading info request %v", resBody)
-		return &Endpoint{}, err
+		return &Info{}, err
 	}
 	err = json.Unmarshal(resBody, &info)
+	return &info, err
+}
+
+func getUAAEndpoint(api string, httpClient *http.Client) (*Endpoint, error) {
+	if api == "" {
+		return DefaultEndpoint(), nil
+	}
+	info, err := getInfo(api, httpClient)
 	URL := info.UserAuthenication.Options.URL
 	return &Endpoint{URL: URL}, err
 }
