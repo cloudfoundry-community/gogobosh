@@ -94,17 +94,15 @@ func NewClient(config *Config) (*Client, error) {
 		return nil, fmt.Errorf("Could not get auth type: %v", err)
 	}
 	if authType != "uaa" {
-		config.HttpClient = &http.Client{
-			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				if len(via) > 10 {
-					return fmt.Errorf("stopped after 10 redirects")
-				}
-				req.URL.Host = strings.TrimPrefix(config.BOSHAddress, req.URL.Scheme+"://")
-				req.SetBasicAuth(config.Username, config.Password)
-				req.Header.Add("User-Agent", "gogo-bosh")
-				req.Header.Del("Referer")
-				return nil
-			},
+		config.HttpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			if len(via) > 10 {
+				return fmt.Errorf("stopped after 10 redirects")
+			}
+			req.URL.Host = strings.TrimPrefix(config.BOSHAddress, req.URL.Scheme+"://")
+			req.SetBasicAuth(config.Username, config.Password)
+			req.Header.Add("User-Agent", "gogo-bosh")
+			req.Header.Del("Referer")
+			return nil
 		}
 	} else {
 		ctx := oauth2.NoContext
