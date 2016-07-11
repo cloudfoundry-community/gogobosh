@@ -122,10 +122,10 @@ func NewClient(config *Config) (*Client, error) {
 		}
 
 		authConfig := &oauth2.Config{
-			ClientID: "cf",
+			ClientID: "bosh_cli",
 			Scopes:   []string{""},
 			Endpoint: oauth2.Endpoint{
-				AuthURL:  endpoint.URL + "/oauth/auth",
+				AuthURL:  endpoint.URL + "/oauth/authorize",
 				TokenURL: endpoint.URL + "/oauth/token",
 			},
 		}
@@ -137,6 +137,16 @@ func NewClient(config *Config) (*Client, error) {
 
 		config.TokenSource = authConfig.TokenSource(ctx, token)
 		config.HttpClient = oauth2.NewClient(ctx, config.TokenSource)
+
+		config.HttpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			if len(via) > 10 {
+				return fmt.Errorf("stopped after 10 redirects")
+			}
+			req.URL.Host = strings.TrimPrefix(config.BOSHAddress, req.URL.Scheme+"://")
+			req.Header.Add("User-Agent", "gogo-bosh")
+			req.Header.Del("Referer")
+			return nil
+		}
 	}
 	client := &Client{
 		config:   *config,
