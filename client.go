@@ -101,6 +101,8 @@ func NewClient(config *Config) (*Client, error) {
 				}
 				req.URL.Host = strings.TrimPrefix(config.BOSHAddress, req.URL.Scheme+"://")
 				req.SetBasicAuth(config.Username, config.Password)
+				req.Header.Add("User-Agent", "gogo-bosh")
+				req.Header.Del("Referer")
 				return nil
 			},
 		}
