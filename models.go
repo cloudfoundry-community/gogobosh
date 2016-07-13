@@ -7,13 +7,15 @@ type Info struct {
 	Version           string            `json:"version"`
 	User              string            `json:"user"`
 	CPI               string            `json:"cpi"`
-	UserAuthenication UserAuthenication `json:"user_authenication"`
+	UserAuthenication UserAuthenication `json:"user_authentication"`
 }
 
 // UserAuthenication struct
 type UserAuthenication struct {
-	Type    string      `json:"type"`
-	Options interface{} `json:"options"`
+	Type    string `json:"type"`
+	Options struct {
+		URL string `json:"url"`
+	} `json:"options"`
 }
 
 // Stemcell struct

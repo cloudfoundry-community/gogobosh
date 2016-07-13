@@ -1,6 +1,6 @@
 language: go
 
-go: 1.5.3
+go: 1.6
 
 install:
   - export PATH=$PATH:$HOME/gopath/bin
