@@ -49,7 +49,7 @@ import (
 )
 
 func main() {
-  c := gogobosh.NewClient(gogobosh.DefaultConfig())
+  c, _ := gogobosh.NewClient(gogobosh.DefaultConfig())
   info, _ := c.GetInfo()
 
   fmt.Println("Director")
