@@ -78,22 +78,25 @@ type VM struct {
 
 // VM Vitals struct
 type Vitals struct {
-	Disk struct {
-		Ephemeral Disk `json:"ephemeral"`
-		System    Disk `json:"system"`
-	} `json:"disk"`
+	Disk Disk     `json:"disk"`
 	Load []string `json:"load"`
 	Mem  Memory   `json:"mem"`
 	Swap Memory   `json:"swap"`
-	CPU  struct {
-		Sys  string `json:"sys"`
-		User string `json:"user"`
-		Wait string `json:"wait"`
-	} `json:"cpu"`
+	CPU  CPU      `json:"cpu"`
+}
+type Disk struct {
+	Ephemeral DiskStats `json:"ephemeral"`
+	System    DiskStats `json:"system"`
+}
+
+type CPU struct {
+	Sys  string `json:"sys"`
+	User string `json:"user"`
+	Wait string `json:"wait"`
 }
 
 // Disk struct
-type Disk struct {
+type DiskStats struct {
 	Percent      string `json:"percent"`
 	InodePercent string `json:"inode_percent"`
 }
