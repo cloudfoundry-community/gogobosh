@@ -3,8 +3,11 @@ package gogobosh
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -29,6 +32,78 @@ func (c *Client) GetStemcells() (stemcells []Stemcell, err error) {
 	err = json.Unmarshal(resBody, &stemcells)
 	if err != nil {
 		log.Printf("Error unmarshaling stemcells %v", err)
+		return
+	}
+	return
+}
+
+// UploadStemcell to given BOSH
+func (c *Client) UploadStemcell(stemcellURI string, sha1 *string) (task Task, err error) {
+	task, err = c.upload("/stemcells", stemcellURI, sha1)
+	return
+}
+
+// UploadRelease to given BOSH
+func (c *Client) UploadRelease(releaseURI string, sha1 *string) (task Task, err error) {
+	task, err = c.upload("/releases", releaseURI, sha1)
+	return
+}
+
+// Upload a file to given BOSH path
+func (c *Client) upload(path string, fileURI string, sha1 *string) (task Task, err error) {
+
+	var (
+		isRemote bool
+		resp     *http.Response
+		body     []byte
+	)
+
+	if isRemote, err = regexp.MatchString("^http(s)?://", fileURI); !isRemote {
+		if _, err = os.Stat(fileURI); os.IsNotExist(err) {
+			err = fmt.Errorf("Stemcell file '%s' does not exist.", fileURI)
+		}
+	}
+	if err != nil {
+		return
+	}
+
+	r := c.NewRequest("POST", path)
+	if isRemote {
+		r.header["Content-Type"] = "application/json"
+		body, err = json.Marshal(struct {
+			Location string  `json:"location"`
+			Sha1     *string `json:"sha1"`
+		}{
+			fileURI,
+			sha1,
+		})
+		if err != nil {
+			return
+		}
+	} else {
+		r.header["Content-Type"] = "application/x-compressed"
+		body, err = ioutil.ReadFile(fileURI)
+		if err != nil {
+			return
+		}
+	}
+	buffer := bytes.NewBuffer(body)
+	r.body = buffer
+
+	resp, err = c.DoRequest(r)
+	defer resp.Body.Close()
+	if err != nil {
+		return
+	}
+	if resp.StatusCode != 200 {
+		err = fmt.Errorf("Bosh director responded with error: %s", resp.Status)
+		return
+	}
+
+	body, err = ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &task)
+	if err != nil {
+		log.Printf("Error unmarshaling task %v", err)
 		return
 	}
 	return

@@ -36,6 +36,62 @@ var _ = Describe("Api", func() {
 			})
 		})
 
+		Describe("Test upload stemcell", func() {
+			BeforeEach(func() {
+				setupMultiple([]MockRoute{
+					{"POST", "/stemcells", "", server.URL + "/tasks/31"},
+					{"GET", "/tasks/31", uploadStemcellTask, ""},
+				}, "basic")
+				config := &Config{
+					BOSHAddress: server.URL,
+					Username:    "admin",
+					Password:    "admin",
+				}
+
+				client, _ = NewClient(config)
+			})
+
+			AfterEach(func() {
+				teardown()
+			})
+
+			It("will upload a stemcell", func() {
+				task, err := client.UploadStemcell("https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-trusty-go_agent?v=3262.2", nil)
+				Expect(err).Should(BeNil())
+				Expect(task.ID).Should(Equal(31))
+				Expect(task.State).Should(Equal("queued"))
+				Expect(task.Description).Should(Equal("create stemcell"))
+			})
+		})
+
+		Describe("Test upload release", func() {
+			BeforeEach(func() {
+				setupMultiple([]MockRoute{
+					{"POST", "/releases", "", server.URL + "/tasks/32"},
+					{"GET", "/tasks/32", uploadReleaseTask, ""},
+				}, "basic")
+				config := &Config{
+					BOSHAddress: server.URL,
+					Username:    "admin",
+					Password:    "admin",
+				}
+
+				client, _ = NewClient(config)
+			})
+
+			AfterEach(func() {
+				teardown()
+			})
+
+			It("will upload a release", func() {
+				task, err := client.UploadRelease("https://bosh.io/d/github.com/cf-platform-eng/docker-boshrelease?v=28.0.1", nil)
+				Expect(err).Should(BeNil())
+				Expect(task.ID).Should(Equal(32))
+				Expect(task.State).Should(Equal("queued"))
+				Expect(task.Description).Should(Equal("create release"))
+			})
+		})
+
 		Describe("Test get releases", func() {
 			BeforeEach(func() {
 				setup(MockRoute{"GET", "/releases", releases, ""}, "basic")

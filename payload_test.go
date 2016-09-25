@@ -67,3 +67,15 @@ const task = `{
 }`
 
 const vms = `{"vm_cid":"ec974048-3352-4ba4-669d-beab87b16bcb","disk_cid":null,"ips":["10.244.0.142"],"dns":[],"agent_id":"c5e7c705-459e-41c0-b640-db32d8dc6e71","job_name":"doppler_z1","index":0,"job_state":"running","resource_pool":"medium_z1","vitals":{"cpu":{"sys":"9.1","user":"2.1","wait":"1.7"},"disk":{"ephemeral":{"inode_percent":"11","percent":"36"},"system":{"inode_percent":"11","percent":"36"}},"load":["0.61","0.74","1.10"],"mem":{"kb":"2520960","percent":"41"},"swap":{"kb":"102200","percent":"10"}},"processes":[{"name":"doppler","state":"running"},{"name":"syslog_drain_binder","state":"running"},{"name":"metron_agent","state":"running"}],"resurrection_paused":false}`
+
+const uploadStemcellTask = `{
+  "id": 31,
+  "state": "queued",
+  "description": "create stemcell"
+}`
+
+const uploadReleaseTask = `{
+  "id": 32,
+  "state": "queued",
+  "description": "create release"
+}`

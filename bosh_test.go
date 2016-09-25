@@ -40,9 +40,15 @@ func setupMultiple(mockEndpoints []MockRoute, authType string) {
 		output := mock.Output
 		redirect := mock.Redirect
 		if redirect != "" {
-			r.Get(endpoint, func(r render.Render) {
-				r.Redirect(redirect)
-			})
+			if method == "GET" {
+				r.Get(endpoint, func(r render.Render) {
+					r.Redirect(redirect)
+				})
+			} else {
+				r.Post(endpoint, func(r render.Render) {
+					r.Redirect(redirect)
+				})
+			}
 		}
 		if method == "GET" {
 			r.Get(endpoint, func() string {
