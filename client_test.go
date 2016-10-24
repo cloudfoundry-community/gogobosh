@@ -81,24 +81,66 @@ var _ = Describe("Client", func() {
 	Describe("Test uaa auth", func() {
 		var client *Client
 
-		BeforeEach(func() {
-			setup(MockRoute{"GET", "/stemcells", `{}`, ""}, "uaa")
-			config := &Config{
-				BOSHAddress: server.URL,
-				Username:    "admin",
-				Password:    "admin",
-			}
-			client, _ = NewClient(config)
+		Context("when the refresh token has expired", func() {
+			BeforeEach(func() {
+				setup(MockRoute{"GET", "/stemcells", `{}`, ""}, "uaa")
+				config := &Config{
+					BOSHAddress: server.URL,
+					Username:    "admin",
+					Password:    "admin",
+				}
+				client, _ = NewClient(config)
+			})
+
+			AfterEach(func() {
+				teardown()
+			})
+
+			Context("and a clientRefresh occurs", func() {
+				It("can get brand new uaa token", func() {
+					token, err := client.GetToken()
+					Expect(err).Should(BeNil())
+					Consistently(token).Should(Equal("bearer foobar2"))
+					_, err = client.GetInfo()
+					Expect(err).Should(BeNil())
+					token, err = client.GetToken()
+					Expect(err).Should(BeNil())
+					Consistently(token).Should(Equal("bearer foobar7"))
+				})
+			})
+
+			Context("and a clientRefresh does not occur", func() {
+				It("can get brand new uaa token", func() {
+					token, err := client.GetToken()
+					Expect(err).Should(BeNil())
+					Consistently(token).Should(Equal("bearer foobar2"))
+					token, err = client.GetToken()
+					Expect(err).Should(MatchError("Error getting bearer token: oauth2: cannot fetch token: 401 Unauthorized\nResponse: {\"error\":\"invalid_token\",\"error_description\":\"Invalid refresh token (expired)\"}"))
+					Consistently(token).Should(Equal(""))
+				})
+			})
 		})
 
-		AfterEach(func() {
-			teardown()
-		})
+		Context("when the refresh token is valid", func() {
+			BeforeEach(func() {
+				setup(MockRoute{"GET", "/stemcells", `{}`, ""}, "uaa")
+				config := &Config{
+					BOSHAddress: server.URL,
+					Username:    "admin",
+					Password:    "admin",
+				}
+				client, _ = NewClient(config)
+			})
 
-		It("can refresh its uaa token", func() {
-			token, err := client.GetToken()
-			Expect(err).Should(BeNil())
-			Consistently(token).Should(Equal("bearer foobar2"))
+			AfterEach(func() {
+				teardown()
+			})
+
+			It("can refresh its uaa token", func() {
+				token, err := client.GetToken()
+				Expect(err).Should(BeNil())
+				Consistently(token).Should(Equal("bearer foobar2"))
+			})
 		})
 	})
 })
