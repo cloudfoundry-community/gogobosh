@@ -105,7 +105,7 @@ func NewClient(config *Config) (*Client, error) {
 			return nil
 		}
 	} else {
-		ctx := getContext(config)
+		ctx := getContext(*config)
 
 		endpoint, err := getUAAEndpoint(config.BOSHAddress, oauth2.NewClient(ctx, nil))
 
@@ -115,7 +115,7 @@ func NewClient(config *Config) (*Client, error) {
 
 		config.Endpoint = endpoint
 
-		authConfig, token, err := getToken(ctx, config)
+		authConfig, token, err := getToken(ctx, *config)
 
 		if err != nil {
 			return nil, fmt.Errorf("Error getting token: %v", err)
@@ -244,21 +244,29 @@ func (c *Client) GetInfo() (info Info, err error) {
 }
 
 func (c *Client) refreshClient() error {
-	config := c.config
-	ctx := getContext(&config)
+	ctx := getContext(c.config)
 
-	authConfig, token, err := getToken(ctx, &config)
+	authConfig, token, err := getToken(ctx, c.config)
 	if err != nil {
 		return fmt.Errorf("Error getting token: %v", err)
 	}
 
-	config.TokenSource = authConfig.TokenSource(ctx, token)
-	config.HttpClient = oauth2.NewClient(ctx, config.TokenSource)
+	c.config.TokenSource = authConfig.TokenSource(ctx, token)
+	c.config.HttpClient = oauth2.NewClient(ctx, c.config.TokenSource)
+	c.config.HttpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if len(via) > 10 {
+			return fmt.Errorf("stopped after 10 redirects")
+		}
+		req.URL.Host = strings.TrimPrefix(c.config.BOSHAddress, req.URL.Scheme+"://")
+		req.Header.Add("User-Agent", "gogo-bosh")
+		req.Header.Del("Referer")
+		return nil
+	}
 
 	return nil
 }
 
-func getToken(ctx context.Context, config *Config) (*oauth2.Config, *oauth2.Token, error) {
+func getToken(ctx context.Context, config Config) (*oauth2.Config, *oauth2.Token, error) {
 	authConfig := &oauth2.Config{
 		ClientID: "bosh_cli",
 		Scopes:   []string{""},
@@ -271,7 +279,7 @@ func getToken(ctx context.Context, config *Config) (*oauth2.Config, *oauth2.Toke
 	return authConfig, token, err
 }
 
-func getContext(config *Config) context.Context {
+func getContext(config Config) context.Context {
 	ctx := oauth2.NoContext
 	if config.SkipSslValidation == false {
 		ctx = context.WithValue(ctx, oauth2.HTTPClient, config.HttpClient)

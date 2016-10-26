@@ -105,7 +105,7 @@ var _ = Describe("Client", func() {
 					Expect(err).Should(BeNil())
 					token, err = client.GetToken()
 					Expect(err).Should(BeNil())
-					Consistently(token).Should(Equal("bearer foobar7"))
+					Consistently(token).Should(Equal("bearer foobar10"))
 				})
 			})
 
