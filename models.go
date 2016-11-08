@@ -74,6 +74,7 @@ type VM struct {
 	DNS               []string `json:"dns"`
 	ResurectionPaused bool     `json:"resurrection_paused"`
 	Vitals            Vitals   `json:"vitals"`
+	ID                string   `json:"id"`
 }
 
 // VM Vitals struct
