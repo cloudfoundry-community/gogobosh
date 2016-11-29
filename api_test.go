@@ -191,6 +191,7 @@ var _ = Describe("Api", func() {
 				vms, err := client.GetDeploymentVMs("foo")
 				Expect(err).Should(BeNil())
 				Expect(vms[0].VMCID).Should(Equal("ec974048-3352-4ba4-669d-beab87b16bcb"))
+				Expect(vms[0].ID).Should(Equal("4a9278c8-e93a-4d6a-b22c-13560208da9e"))
 				Expect(vms[0].IPs[0]).Should(Equal("10.244.0.142"))
 				Expect(vms[0].AgentID).Should(Equal("c5e7c705-459e-41c0-b640-db32d8dc6e71"))
 				Expect(vms[0].JobName).Should(Equal("doppler_z1"))
