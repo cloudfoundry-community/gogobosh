@@ -101,12 +101,19 @@ func FakeUAAServer() *httptest.Server {
 	r := martini.NewRouter()
 	count := 1
 	r.Post("/oauth/token", func(r render.Render) {
-		r.JSON(200, map[string]interface{}{
-			"token_type":    "bearer",
-			"access_token":  "foobar" + strconv.Itoa(count),
-			"refresh_token": "barfoo",
-			"expires_in":    3,
-		})
+		if count == 3 {
+			r.JSON(401, map[string]interface{}{
+				"error":             "invalid_token",
+				"error_description": "Invalid refresh token (expired)",
+			})
+		} else {
+			r.JSON(200, map[string]interface{}{
+				"token_type":    "bearer",
+				"access_token":  "foobar" + strconv.Itoa(count),
+				"refresh_token": "barfoo",
+				"expires_in":    3,
+			})
+		}
 		count = count + 1
 	})
 	r.NotFound(func() string { return "" })

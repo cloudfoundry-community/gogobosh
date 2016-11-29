@@ -30,6 +30,7 @@ type Config struct {
 	HttpClient        *http.Client
 	SkipSslValidation bool
 	TokenSource       oauth2.TokenSource
+	Endpoint          *Endpoint
 }
 
 type Endpoint struct {
@@ -104,15 +105,7 @@ func NewClient(config *Config) (*Client, error) {
 			return nil
 		}
 	} else {
-		ctx := oauth2.NoContext
-		if config.SkipSslValidation == false {
-			ctx = context.WithValue(ctx, oauth2.HTTPClient, defConfig.HttpClient)
-		} else {
-			tr := &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			}
-			ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{Transport: tr})
-		}
+		ctx := getContext(*config)
 
 		endpoint, err := getUAAEndpoint(config.BOSHAddress, oauth2.NewClient(ctx, nil))
 
@@ -120,16 +113,10 @@ func NewClient(config *Config) (*Client, error) {
 			return nil, fmt.Errorf("Could not get api /info: %v", err)
 		}
 
-		authConfig := &oauth2.Config{
-			ClientID: "bosh_cli",
-			Scopes:   []string{""},
-			Endpoint: oauth2.Endpoint{
-				AuthURL:  endpoint.URL + "/oauth/authorize",
-				TokenURL: endpoint.URL + "/oauth/token",
-			},
-		}
+		config.Endpoint = endpoint
 
-		token, err := authConfig.PasswordCredentialsToken(ctx, config.Username, config.Password)
+		authConfig, token, err := getToken(ctx, *config)
+
 		if err != nil {
 			return nil, fmt.Errorf("Error getting token: %v", err)
 		}
@@ -217,6 +204,12 @@ func (c *Client) DoRequest(r *request) (*http.Response, error) {
 	req.SetBasicAuth(c.config.Username, c.config.Password)
 	req.Header.Add("User-Agent", "gogo-bosh")
 	resp, err := c.config.HttpClient.Do(req)
+	if err != nil {
+		if strings.Contains(err.Error(), "oauth2: cannot fetch token") {
+			c.refreshClient()
+			resp, err = c.config.HttpClient.Do(req)
+		}
+	}
 	return resp, err
 }
 
@@ -250,6 +243,55 @@ func (c *Client) GetInfo() (info Info, err error) {
 	return
 }
 
+func (c *Client) refreshClient() error {
+	ctx := getContext(c.config)
+
+	authConfig, token, err := getToken(ctx, c.config)
+	if err != nil {
+		return fmt.Errorf("Error getting token: %v", err)
+	}
+
+	c.config.TokenSource = authConfig.TokenSource(ctx, token)
+	c.config.HttpClient = oauth2.NewClient(ctx, c.config.TokenSource)
+	c.config.HttpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if len(via) > 10 {
+			return fmt.Errorf("stopped after 10 redirects")
+		}
+		req.URL.Host = strings.TrimPrefix(c.config.BOSHAddress, req.URL.Scheme+"://")
+		req.Header.Add("User-Agent", "gogo-bosh")
+		req.Header.Del("Referer")
+		return nil
+	}
+
+	return nil
+}
+
+func getToken(ctx context.Context, config Config) (*oauth2.Config, *oauth2.Token, error) {
+	authConfig := &oauth2.Config{
+		ClientID: "bosh_cli",
+		Scopes:   []string{""},
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  config.Endpoint.URL + "/oauth/authorize",
+			TokenURL: config.Endpoint.URL + "/oauth/token",
+		},
+	}
+	token, err := authConfig.PasswordCredentialsToken(ctx, config.Username, config.Password)
+	return authConfig, token, err
+}
+
+func getContext(config Config) context.Context {
+	ctx := oauth2.NoContext
+	if config.SkipSslValidation == false {
+		ctx = context.WithValue(ctx, oauth2.HTTPClient, config.HttpClient)
+	} else {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{Transport: tr})
+	}
+	return ctx
+}
+
 // toHTTP converts the request to an HTTP request
 func (r *request) toHTTP() (*http.Request, error) {
 
@@ -266,6 +308,7 @@ func (r *request) toHTTP() (*http.Request, error) {
 	return http.NewRequest(r.method, r.url, r.body)
 }
 
+// GetToken - returns the current token bearer
 func (c *Client) GetToken() (string, error) {
 	token, err := c.config.TokenSource.Token()
 	if err != nil {
