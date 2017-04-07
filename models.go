@@ -65,16 +65,23 @@ type Manifest struct {
 
 // VM struct
 type VM struct {
-	AgentID           string   `json:"agent_id"`
-	VMCID             string   `json:"vm_cid"`
-	CID               string   `json:"cid"`
-	JobName           string   `json:"job_name"`
-	Index             int      `json:"index"`
-	IPs               []string `json:"ips"`
-	DNS               []string `json:"dns"`
-	ResurectionPaused bool     `json:"resurrection_paused"`
-	Vitals            Vitals   `json:"vitals"`
-	ID                string   `json:"id"`
+	VMCID             string    `json:"vm_cid"`
+	IPs               []string  `json:"ips"`
+	DNS               []string  `json:"dns"`
+	AgentID           string    `json:"agent_id"`
+	JobName           string    `json:"job_name"`
+	Index             int       `json:"index"`
+	JobState          string    `json:"job_state"`
+	State             string    `json:"state"`
+	ResourcePool      string    `json:"resource_pool"`
+	VMType            string    `json:"vm_type"`
+	Vitals            Vitals    `json:"vitals"`
+	Processes         []Process `json:"processes"`
+	ResurectionPaused bool      `json:"resurrection_paused"`
+	AZ                string    `json:"az"`
+	ID                string    `json:"id"`
+	Bootstrap         bool      `json:"bootstrap"`
+	Ignore            bool      `json:"ignore"`
 }
 
 // VM Vitals struct
@@ -85,18 +92,22 @@ type Vitals struct {
 	Swap Memory   `json:"swap"`
 	CPU  CPU      `json:"cpu"`
 }
+
+// Disk struct
 type Disk struct {
-	Ephemeral DiskStats `json:"ephemeral"`
-	System    DiskStats `json:"system"`
+	Ephemeral  DiskStats `json:"ephemeral"`
+	System     DiskStats `json:"system"`
+	Persistent DiskStats `json:"persistent"`
 }
 
+// CPU struct
 type CPU struct {
 	Sys  string `json:"sys"`
 	User string `json:"user"`
 	Wait string `json:"wait"`
 }
 
-// Disk struct
+// DiskStats struct
 type DiskStats struct {
 	Percent      string `json:"percent"`
 	InodePercent string `json:"inode_percent"`
@@ -106,6 +117,31 @@ type DiskStats struct {
 type Memory struct {
 	Percent string `json:"percent"`
 	KB      string `json:"KB"`
+}
+
+// VM Process struct
+type Process struct {
+	Name   string        `json:"name"`
+	State  string        `json:"state"`
+	Uptime Uptime        `json:"uptime"`
+	Mem    ProcessMemory `json:"mem"`
+	CPU    ProcessCPU    `json:"cpu"`
+}
+
+// Uptime struct
+type Uptime struct {
+	Secs int `json:"secs"`
+}
+
+// Process CPU struct
+type ProcessCPU struct {
+	Total float64 `json:"total"`
+}
+
+// Memory struct
+type ProcessMemory struct {
+	Percent float64 `json:"percent"`
+	KB      int     `json:"KB"`
 }
 
 // Task struct
