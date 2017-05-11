@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/srbry/gogobosh",
 	"GoVersion": "go1.6",
-	"GodepVersion": "v62",
+	"GodepVersion": "v79",
 	"Deps": [
 		{
 			"ImportPath": "github.com/codegangsta/inject",
@@ -162,11 +162,15 @@
 		},
 		{
 			"ImportPath": "golang.org/x/oauth2",
-			"Rev": "9ef2eddcc6774e42f998940fe1167216d36a7424"
+			"Rev": "ad516a297a9f2a74ecc244861b298c94bdd28b9d"
 		},
 		{
 			"ImportPath": "golang.org/x/oauth2/internal",
-			"Rev": "9ef2eddcc6774e42f998940fe1167216d36a7424"
+			"Rev": "ad516a297a9f2a74ecc244861b298c94bdd28b9d"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/clientcredentials",
+			"Rev": "ad516a297a9f2a74ecc244861b298c94bdd28b9d"
 		}
 	]
 }

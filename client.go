@@ -5,14 +5,16 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 //Client used to communicate with BOSH
@@ -26,6 +28,8 @@ type Config struct {
 	BOSHAddress       string
 	Username          string
 	Password          string
+	ClientID          string
+	ClientSecret      string
 	UAAAuth           bool
 	HttpClient        *http.Client
 	SkipSslValidation bool
@@ -115,14 +119,24 @@ func NewClient(config *Config) (*Client, error) {
 
 		config.Endpoint = endpoint
 
-		authConfig, token, err := getToken(ctx, *config)
+		if config.ClientID == "" { //No ClientID? Do UAA User auth
+			authConfig, token, err := getToken(ctx, *config)
 
-		if err != nil {
-			return nil, fmt.Errorf("Error getting token: %v", err)
+			if err != nil {
+				return nil, fmt.Errorf("Error getting token: %v", err)
+			}
+
+			config.TokenSource = authConfig.TokenSource(ctx, token)
+			config.HttpClient = oauth2.NewClient(ctx, config.TokenSource)
+		} else { //Got a ClientID? Do UAA Client Auth (two-legged auth)
+			authConfig := &clientcredentials.Config{
+				ClientID:     config.ClientID,
+				ClientSecret: config.ClientSecret,
+				TokenURL:     endpoint.URL + "/oauth/token",
+			}
+			config.TokenSource = authConfig.TokenSource(ctx)
+			config.HttpClient = authConfig.Client(ctx)
 		}
-
-		config.TokenSource = authConfig.TokenSource(ctx, token)
-		config.HttpClient = oauth2.NewClient(ctx, config.TokenSource)
 
 		config.HttpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 			if len(via) > 10 {
