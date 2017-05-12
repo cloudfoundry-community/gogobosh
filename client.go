@@ -90,6 +90,7 @@ func NewClient(config *Config) (*Client, error) {
 
 	endpoint := &Endpoint{}
 	config.HttpClient = &http.Client{
+		Timeout: timeout,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: config.SkipSslValidation,
@@ -302,16 +303,7 @@ func getToken(ctx context.Context, config Config) (*oauth2.Config, *oauth2.Token
 }
 
 func getContext(config Config) context.Context {
-	ctx := oauth2.NoContext
-	if config.SkipSslValidation == false {
-		ctx = context.WithValue(ctx, oauth2.HTTPClient, config.HttpClient)
-	} else {
-		tr := &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-		ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{Transport: tr})
-	}
-	return ctx
+	return context.WithValue(oauth2.NoContext, oauth2.HTTPClient, config.HttpClient)
 }
 
 // toHTTP converts the request to an HTTP request
