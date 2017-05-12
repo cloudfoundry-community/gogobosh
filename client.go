@@ -93,6 +93,10 @@ func NewClient(config *Config) (*Client, error) {
 			},
 		},
 	}
+
+	//Save the configured HTTP Client timeout for later
+	timeout := config.HttpClient.Timeout
+
 	authType, err := getAuthType(config.BOSHAddress, config.HttpClient)
 	if err != nil {
 		return nil, fmt.Errorf("Could not get auth type: %v", err)
@@ -148,6 +152,10 @@ func NewClient(config *Config) (*Client, error) {
 			return nil
 		}
 	}
+
+	//Restore the timeout from the provided HTTP Client
+	config.HttpClient.Timeout = timeout
+
 	client := &Client{
 		config:   *config,
 		Endpoint: *endpoint,
