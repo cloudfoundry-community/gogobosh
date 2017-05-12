@@ -85,6 +85,9 @@ func NewClient(config *Config) (*Client, error) {
 		config.Password = defConfig.Password
 	}
 
+	//Save the configured HTTP Client timeout for later
+	timeout := config.HttpClient.Timeout
+
 	endpoint := &Endpoint{}
 	config.HttpClient = &http.Client{
 		Transport: &http.Transport{
@@ -93,9 +96,6 @@ func NewClient(config *Config) (*Client, error) {
 			},
 		},
 	}
-
-	//Save the configured HTTP Client timeout for later
-	timeout := config.HttpClient.Timeout
 
 	authType, err := getAuthType(config.BOSHAddress, config.HttpClient)
 	if err != nil {
