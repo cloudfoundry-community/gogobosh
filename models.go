@@ -133,12 +133,12 @@ type Uptime struct {
 	Secs int `json:"secs"`
 }
 
-// Process CPU struct
+// ProcessCPU struct
 type ProcessCPU struct {
 	Total float64 `json:"total"`
 }
 
-// Memory struct
+// ProcessMemory struct
 type ProcessMemory struct {
 	Percent float64 `json:"percent"`
 	KB      int     `json:"KB"`
