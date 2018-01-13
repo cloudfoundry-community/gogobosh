@@ -35,6 +35,44 @@ func (c *Client) GetStemcells() ([]Stemcell, error) {
 	return stemcells, err
 }
 
+func (c *Client) UploadStemcell(url, sha1 string) (Task, error) {
+	task := Task{}
+	r := c.NewRequest("POST", "/stemcells")
+	in := struct {
+		Location string `json:"location"`
+		SHA1     string `json:"sha1"`
+	}{
+		Location: url,
+		SHA1:     sha1,
+	}
+
+	b, err := json.Marshal(&in)
+	if err != nil {
+		return task, err
+	}
+
+	r.body = bytes.NewBuffer(b)
+	r.header["Content-Type"] = "application/json"
+
+	resp, err := c.DoRequest(r)
+	if err != nil {
+		log.Printf("Error requesting stemcell upload %v", err)
+		return task, err
+	}
+	defer resp.Body.Close()
+
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Error reading task request %v", resBody)
+		return task, err
+	}
+	err = json.Unmarshal(resBody, &task)
+	if err != nil {
+		log.Printf("Error unmarshaling task %v", err)
+	}
+	return task, err
+}
+
 // GetReleases from given BOSH
 func (c *Client) GetReleases() ([]Release, error) {
 	r := c.NewRequest("GET", "/releases")
