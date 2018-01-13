@@ -277,3 +277,54 @@ func (c *Client) GetTaskResult(id int) []string {
 
 	return strings.Split(string(resBody), "\n")
 }
+
+// GetCloudConfig from given BOSH
+func (c *Client) GetCloudConfig(latest bool) (Cfg, error) {
+	cfg := Cfg{}
+
+	qs := "?latest=true"
+	if !latest {
+		qs = "?latest=false"
+	}
+	r := c.NewRequest("GET", "/configs"+qs)
+	resp, err := c.DoRequest(r)
+	if err != nil {
+		return cfg, err
+	}
+	defer resp.Body.Close()
+
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return cfg, err
+	}
+	return cfg, json.Unmarshal(resBody, &cfg)
+}
+
+// UpdateCloudConfig
+func (c *Client) UpdateCloudConfig(config string) error {
+	r := c.NewRequest("POST", "/configs")
+	in := struct {
+		Name    string `json:"name"`
+		Type    string `json:"type"`
+		Content string `json:"content"`
+	}{
+		Name:    "default",
+		Type:    "cloud",
+		Content: config,
+	}
+	b, err := json.Marshal(&in)
+	if err != nil {
+		return err
+	}
+
+	r.body = bytes.NewBuffer(b)
+	r.header["Content-Type"] = "application/json"
+
+	resp, err := c.DoRequest(r)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}

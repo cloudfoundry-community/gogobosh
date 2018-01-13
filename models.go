@@ -153,3 +153,12 @@ type Task struct {
 	Result      string `json:"result"`
 	User        string `json:"user"`
 }
+
+// Cfg struct
+type Cfg struct {
+	Name      string `json:"name"`
+	Type      string `json:"name"`
+	Content   string `json:"content"`
+	CreatedAt int    `json:"int"`
+	Deleted   bool   `json:"deleted"`
+}
