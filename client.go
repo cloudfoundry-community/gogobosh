@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -86,7 +87,10 @@ func NewClient(config *Config) (*Client, error) {
 	}
 
 	//Save the configured HTTP Client timeout for later
-	timeout := config.HttpClient.Timeout
+	var timeout time.Duration
+	if config.HttpClient != nil {
+		timeout = config.HttpClient.Timeout
+	}
 
 	endpoint := &Endpoint{}
 	config.HttpClient = &http.Client{
