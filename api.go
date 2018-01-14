@@ -3,6 +3,7 @@ package gogobosh
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"regexp"
@@ -187,23 +188,33 @@ func (c *Client) GetDeployment(name string) (Manifest, error) {
 // DeleteDeployment from given BOSH
 func (c *Client) DeleteDeployment(name string) (Task, error) {
 	task := Task{}
-	r := c.NewRequest("DELETE", "/deployments/"+name+"?force=true")
+	r := c.NewRequest("DELETE", "/deployments/"+name)
 	resp, err := c.DoRequest(r)
 
 	if err != nil {
 		log.Printf("Error requesting deleting deployment %v", err)
 		return task, err
 	}
+
 	defer resp.Body.Close()
-	url, _ := resp.Location()
-	re, _ := regexp.Compile(`(\d+)$`)
-	stringID := re.FindStringSubmatch(url.Path)
-	id, err := strconv.Atoi(stringID[0])
+
+	if resp.StatusCode == 404 {
+		return task, fmt.Errorf("deployment %s not found", name)
+	}
+
+	url, err := resp.Location()
 	if err != nil {
+		log.Printf("Error determining task to follow: %s", err)
 		return task, err
 	}
-	task, err = c.GetTask(id)
-	return task, err
+
+	m := regexp.MustCompile(`(\d+)$`).FindStringSubmatch(url.Path)
+	id, err := strconv.Atoi(m[0])
+	if err != nil {
+		log.Printf("Error parsing task ID from '%s': %s", m[0], err)
+		return task, err
+	}
+	return c.GetTask(id)
 }
 
 // CreateDeployment from given BOSH
