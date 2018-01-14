@@ -295,25 +295,45 @@ func (c *Client) GetTask(id int) (Task, error) {
 	return task, err
 }
 
+// GetTaskOutput ...
+func (c *Client) GetTaskOutput(id int, typ string) ([]string, error) {
+	r := c.NewRequest("GET", "/tasks/"+strconv.Itoa(id)+"/output?type="+typ)
+
+	res, err := c.DoRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return strings.Split(strings.TrimSuffix(string(b), "\n"), "\n"), nil
+}
+
 // GetTaskResult from given BOSH
 func (c *Client) GetTaskResult(id int) []string {
-	stringID := strconv.Itoa(id)
-	r := c.NewRequest("GET", "/tasks/"+stringID+"/output?type=result")
-	resp, err := c.DoRequest(r)
+	l, _ := c.GetTaskOutput(id, "result")
+	return l
+}
 
+func (c *Client) GetTaskEvents(id int) ([]TaskEvent, error) {
+	raw, err := c.GetTaskOutput(id, "event")
 	if err != nil {
-		log.Printf("Error requesting task %v", err)
-		return nil
-	}
-	defer resp.Body.Close()
-
-	resBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Printf("Error reading task request %v", resBody)
-		return nil
+		return nil, err
 	}
 
-	return strings.Split(string(resBody), "\n")
+	events := make([]TaskEvent, len(raw))
+	for i := range raw {
+		err = json.Unmarshal([]byte(raw[i]), &events[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return events, nil
 }
 
 // GetCloudConfig from given BOSH

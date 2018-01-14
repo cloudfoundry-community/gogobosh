@@ -154,6 +154,38 @@ type Task struct {
 	User        string `json:"user"`
 }
 
+// Event struct
+type Event struct {
+	ID         string                 `json:"id"`
+	ParentID   string                 `json:"parent_id"`
+	Timestamp  int                    `json:"timestamp"`
+	User       string                 `json:"user"`
+	Action     string                 `json:"action"`
+	ObjectType string                 `json:"object_type"`
+	ObjectName string                 `json:"object_name"`
+	Task       string                 `json:"task"`
+	Deployment string                 `json:"deployment"`
+	Error      string                 `json:"error"`
+	Context    map[string]interface{} `json:"context"`
+}
+
+// TaskEvent struct
+type TaskEvent struct {
+	Time     int      `json:"time"`
+	Stage    string   `json:"stage"`
+	Tags     []string `json:"tags"`
+	Total    int      `json:"total"`
+	Task     string   `json:"task"`
+	Index    int      `json:"index"`
+	State    string   `json:"state"`
+	Progress int      `json:"progress"`
+
+	Error struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	} `json:"error"`
+}
+
 // Cfg struct
 type Cfg struct {
 	Name      string `json:"name"`
