@@ -435,3 +435,31 @@ func (c *Client) UpdateCloudConfig(config string) error {
 
 	return nil
 }
+
+//CleanUp will post to the cleanup endpoint of bosh, passing along the removeall flag passed in as a bool
+func (c *Client) CleanUp(removeall bool) error {
+	r := c.NewRequest("POST", "/cleanup")
+	var requestBody struct {
+		Config struct {
+			RemoveAll bool `json:"remove_all"`
+		} `json:"config"`
+	}
+
+	requestBody.Config.RemoveAll = removeall
+
+	b, err := json.Marshal(&requestBody)
+	if err != nil {
+		return err
+	}
+
+	r.body = bytes.NewBuffer(b)
+	r.header["Content-Type"] = "application/json"
+
+	resp, err := c.DoRequest(r)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
