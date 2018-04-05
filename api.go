@@ -436,8 +436,8 @@ func (c *Client) UpdateCloudConfig(config string) error {
 	return nil
 }
 
-//CleanUp will post to the cleanup endpoint of bosh, passing along the removeall flag passed in as a bool
-func (c *Client) CleanUp(removeall bool) error {
+//Cleanup will post to the cleanup endpoint of bosh, passing along the removeall flag passed in as a bool
+func (c *Client) Cleanup(removeall bool) error {
 	r := c.NewRequest("POST", "/cleanup")
 	var requestBody struct {
 		Config struct {
