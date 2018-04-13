@@ -3,9 +3,11 @@ package gogobosh
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
@@ -437,29 +439,42 @@ func (c *Client) UpdateCloudConfig(config string) error {
 }
 
 //Cleanup will post to the cleanup endpoint of bosh, passing along the removeall flag passed in as a bool
-func (c *Client) Cleanup(removeall bool) error {
+func (c *Client) Cleanup(removeall bool) (int, error) {
 	r := c.NewRequest("POST", "/cleanup")
 	var requestBody struct {
 		Config struct {
 			RemoveAll bool `json:"remove_all"`
 		} `json:"config"`
 	}
-
 	requestBody.Config.RemoveAll = removeall
-
 	b, err := json.Marshal(&requestBody)
 	if err != nil {
-		return err
+		return -1, err
 	}
-
 	r.body = bytes.NewBuffer(b)
 	r.header["Content-Type"] = "application/json"
-
 	resp, err := c.DoRequest(r)
 	if err != nil {
-		return err
+		return -1, err
 	}
+	taskID, err := getTaskIDFromResponse(resp)
 	defer resp.Body.Close()
+	return taskID, nil
+}
 
-	return nil
+func getTaskIDFromResponse(resp *http.Response) (int, error) {
+	respLocation, err := resp.Location()
+	if err != nil {
+		return -1, err
+	}
+	idRegex := regexp.MustCompile("/tasks/([0-9]+)")
+	idMatches := idRegex.FindStringSubmatch(respLocation.String())
+	if idMatches == nil {
+		return -1, errors.New("No id matches found in URL location")
+	}
+	taskID, err := strconv.Atoi(idMatches[1])
+	if err != nil {
+		return -1, err
+	}
+	return taskID, nil
 }
