@@ -435,3 +435,38 @@ func (c *Client) UpdateCloudConfig(config string) error {
 
 	return nil
 }
+
+//Cleanup will post to the cleanup endpoint of bosh, passing along the removeall flag passed in as a bool
+func (c *Client) Cleanup(removeall bool) (Task, error) {
+	task := Task{}
+	r := c.NewRequest("POST", "/cleanup")
+	var requestBody struct {
+		Config struct {
+			RemoveAll bool `json:"remove_all"`
+		} `json:"config"`
+	}
+	requestBody.Config.RemoveAll = removeall
+	b, err := json.Marshal(&requestBody)
+	if err != nil {
+		return task, err
+	}
+	r.body = bytes.NewBuffer(b)
+	r.header["Content-Type"] = "application/json"
+	resp, err := c.DoRequest(r)
+	if err != nil {
+		return task, err
+	}
+
+	defer resp.Body.Close()
+
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Error reading task request %v", resBody)
+		return task, err
+	}
+	err = json.Unmarshal(resBody, &task)
+	if err != nil {
+		log.Printf("Error unmarshaling task %v", err)
+	}
+	return task, err
+}
