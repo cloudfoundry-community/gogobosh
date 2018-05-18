@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -295,8 +296,9 @@ func (c *Client) GetDeploymentVMs(name string) ([]VM, error) {
 }
 
 // GetTasks from given BOSH
-func (c *Client) GetTasks() ([]Task, error) {
-	r := c.NewRequest("GET", "/tasks")
+func (c *Client) GetTasksByQuery(query url.Values) ([]Task, error) {
+	requestUrl := "/tasks?" + query.Encode()
+	r := c.NewRequest("GET", requestUrl)
 	resp, err := c.DoRequest(r)
 
 	if err != nil {
@@ -317,6 +319,10 @@ func (c *Client) GetTasks() ([]Task, error) {
 		log.Printf("Error unmarshaling tasks %v", err)
 	}
 	return tasks, err
+}
+
+func (c *Client) GetTasks() ([]Task, error) {
+	return c.GetTasksByQuery(nil)
 }
 
 // GetTask from given BOSH

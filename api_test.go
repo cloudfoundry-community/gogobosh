@@ -4,6 +4,7 @@ import (
 	. "github.com/cloudfoundry-community/gogobosh"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"net/url"
 )
 
 var _ = Describe("Api", func() {
@@ -135,6 +136,33 @@ var _ = Describe("Api", func() {
 
 			It("can get tasks", func() {
 				tasks, err := client.GetTasks()
+				Expect(err).Should(BeNil())
+				Expect(tasks[0].ID).Should(Equal(1180))
+				Expect(tasks[0].State).Should(Equal("processing"))
+				Expect(tasks[0].Description).Should(Equal("run errand acceptance_tests from deployment cf-warden"))
+			})
+		})
+
+		Describe("Test tasks by query", func() {
+			BeforeEach(func() {
+				setup(MockRoute{"GET", "/tasks?state=processing", tasks, ""}, "basic")
+				config := &Config{
+					BOSHAddress: server.URL,
+					Username:    "admin",
+					Password:    "admin",
+				}
+
+				client, _ = NewClient(config)
+			})
+
+			AfterEach(func() {
+				teardown()
+			})
+
+			It("can get filtered tasks", func() {
+				q := url.Values{}
+				q.Set("state", "processing")
+				tasks, err := client.GetTasksByQuery(q)
 				Expect(err).Should(BeNil())
 				Expect(tasks[0].ID).Should(Equal(1180))
 				Expect(tasks[0].State).Should(Equal("processing"))
