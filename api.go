@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -187,34 +186,28 @@ func (c *Client) GetDeployment(name string) (Manifest, error) {
 
 // DeleteDeployment from given BOSH
 func (c *Client) DeleteDeployment(name string) (Task, error) {
-	task := Task{}
-	r := c.NewRequest("DELETE", "/deployments/"+name)
-	resp, err := c.DoRequest(r)
-
+	var task Task
+	resp, err := c.DoRequest(c.NewRequest("DELETE", "/deployments/"+name))
 	if err != nil {
 		log.Printf("Error requesting deleting deployment %v", err)
 		return task, err
 	}
-
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 404 {
 		return task, fmt.Errorf("deployment %s not found", name)
 	}
 
-	url, err := resp.Location()
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error determining task to follow: %s", err)
+		log.Printf("Error reading task response %v", err)
 		return task, err
 	}
-
-	m := regexp.MustCompile(`(\d+)$`).FindStringSubmatch(url.Path)
-	id, err := strconv.Atoi(m[0])
+	err = json.Unmarshal(b, &task)
 	if err != nil {
-		log.Printf("Error parsing task ID from '%s': %s", m[0], err)
-		return task, err
+		log.Printf("Error unmarshaling task %v", err)
 	}
-	return c.GetTask(id)
+	return task, err
 }
 
 // CreateDeployment from given BOSH
@@ -235,7 +228,7 @@ func (c *Client) CreateDeployment(manifest string) (Task, error) {
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading task request %v", resBody)
+		log.Printf("Error reading task response %v", resBody)
 		return task, err
 	}
 	err = json.Unmarshal(resBody, &task)
