@@ -66,7 +66,7 @@ func setupMultiple(mockEndpoints []MockRoute, authType string) {
 				Version: "1.3126.0 (00000000)",
 				User:    "admin",
 				CPI:     "warden_cpi",
-				UserAuthenication: UserAuthenication{
+				UserAuthentication: UserAuthentication{
 					Type: "basic",
 				},
 			})
@@ -79,7 +79,7 @@ func setupMultiple(mockEndpoints []MockRoute, authType string) {
 				Version: "1.3126.0 (00000000)",
 				User:    "admin",
 				CPI:     "warden_cpi",
-				UserAuthenication: UserAuthenication{
+				UserAuthentication: UserAuthentication{
 					Type: "uaa",
 					Options: struct {
 						URL string `json:"url"`

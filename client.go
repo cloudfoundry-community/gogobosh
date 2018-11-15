@@ -171,7 +171,7 @@ func NewClient(config *Config) (*Client, error) {
 
 func getAuthType(api string, httpClient *http.Client) (string, error) {
 	info, err := getInfo(api, httpClient)
-	return info.UserAuthenication.Type, err
+	return info.UserAuthentication.Type, err
 }
 
 func getInfo(api string, httpClient *http.Client) (*Info, error) {
@@ -204,7 +204,7 @@ func getUAAEndpoint(api string, httpClient *http.Client) (*Endpoint, error) {
 		return DefaultEndpoint(), nil
 	}
 	info, err := getInfo(api, httpClient)
-	URL := info.UserAuthenication.Options.URL
+	URL := info.UserAuthentication.Options.URL
 	return &Endpoint{URL: URL}, err
 }
 

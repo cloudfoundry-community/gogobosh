@@ -7,11 +7,11 @@ type Info struct {
 	Version           string            `json:"version"`
 	User              string            `json:"user"`
 	CPI               string            `json:"cpi"`
-	UserAuthenication UserAuthenication `json:"user_authentication"`
+	UserAuthentication UserAuthentication `json:"user_authentication"`
 }
 
-// UserAuthenication struct
-type UserAuthenication struct {
+// UserAuthentication struct
+type UserAuthentication struct {
 	Type    string `json:"type"`
 	Options struct {
 		URL string `json:"url"`
