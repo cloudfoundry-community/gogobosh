@@ -287,6 +287,55 @@ func (c *Client) GetDeploymentVMs(name string) ([]VM, error) {
 	return vms, err
 }
 
+// GetDeploymentInstances from given BOSH
+func (c *Client) GetDeploymentInstances(name string) ([]VM, error) {
+	var task Task
+	r := c.NewRequest("GET", "/deployments/"+name+"/instances?format=full")
+	resp, err := c.DoRequest(r)
+
+	if err != nil {
+		log.Printf("Error requesting deployment instances %v", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Error reading deployment instances request %v", resBody)
+		return nil, err
+	}
+	err = json.Unmarshal(resBody, &task)
+	if err != nil {
+		log.Printf("Error unmarshaling tasks %v", err)
+		return nil, err
+	}
+	for {
+		taskStatus, err := c.GetTask(task.ID)
+		if err != nil {
+			log.Printf("Error getting task %v", err)
+		}
+		if taskStatus.State == "done" {
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
+
+	vms := []VM{}
+	output := c.GetTaskResult(task.ID)
+	for _, value := range output {
+		if len(value) > 0 {
+			var vm VM
+			err = json.Unmarshal([]byte(value), &vm)
+			if err != nil {
+				log.Printf("Error unmarshaling instances %v %v", value, err)
+				return nil, err
+			}
+			vms = append(vms, vm)
+		}
+	}
+	return vms, err
+}
+
 // GetTasks from given BOSH
 func (c *Client) GetTasks() ([]Task, error) {
 	r := c.NewRequest("GET", "/tasks")
