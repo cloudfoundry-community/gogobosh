@@ -233,7 +233,10 @@ func (c *Client) DoRequest(r *request) (*http.Response, error) {
 	resp, err := c.config.HttpClient.Do(req)
 	if err != nil {
 		if strings.Contains(err.Error(), "oauth2: cannot fetch token") {
-			c.refreshClient()
+			err = c.refreshClient()
+			if err != nil {
+				log.Printf("Error refreshing UAA client: %s\n", err.Error())
+			}
 			resp, err = c.config.HttpClient.Do(req)
 		}
 	}
@@ -271,6 +274,19 @@ func (c *Client) GetInfo() (info Info, err error) {
 }
 
 func (c *Client) refreshClient() error {
+	log.Printf("Refreshing expired UAA token...")
+
+	// Create a new http client to avoid authentication failure when getting a new
+	// token as the oauth2 client passes along the expired/revoked refresh token.
+	c.config.HttpClient = &http.Client{
+		Timeout: c.config.HttpClient.Timeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: c.config.SkipSslValidation,
+			},
+		},
+	}
+
 	ctx := getContext(c.config)
 
 	authConfig, token, err := getToken(ctx, c.config)
