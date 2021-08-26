@@ -232,10 +232,21 @@ func (c *Client) DoRequest(r *request) (*http.Response, error) {
 	req.Header.Add("User-Agent", "gogo-bosh")
 	resp, err := c.config.HttpClient.Do(req)
 	if err != nil {
+		log.Printf("Error in DoRequest: '%v'\n  Err: '%v'\n", r, err)
 		if strings.Contains(err.Error(), "oauth2: cannot fetch token") {
 			err = c.refreshClient()
 			if err != nil {
 				log.Printf("Error refreshing UAA client: %s\n", err.Error())
+			}
+			resp, err = c.config.HttpClient.Do(req)
+		}
+	}
+	if resp.StatusCode > 399 {
+		log.Printf("4xx/5xx Code in DoRequest: '%v' - Status: %v \n  Err: '%v'\n", r, err, resp.Status)
+		if strings.Contains(resp.Status, "Unauthorized") {
+			err = c.refreshClient()
+			if err != nil {
+				log.Printf("Error refreshing UAA client from 400: %s\n", err.Error())
 			}
 			resp, err = c.config.HttpClient.Do(req)
 		}
