@@ -2,6 +2,7 @@
 
 This project is a golang library for applications wanting to talk to a BOSH/MicroBOSH or bosh-lite.
 
+![Build workflow](https://github.com/cloudfoundry-community/gogobosh/actions/workflows/build.yml/badge.svg)
 [![GoDoc](https://godoc.org/github.com/cloudfoundry-community/gogobosh?status.png)](https://godoc.org/github.com/cloudfoundry-community/gogobosh)
 
 ## API
