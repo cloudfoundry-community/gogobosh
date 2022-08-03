@@ -171,7 +171,7 @@ func NewClient(config *Config) (*Client, error) {
 
 func getAuthType(api string, httpClient *http.Client) (string, error) {
 	info, err := getInfo(api, httpClient)
-	return info.UserAuthenication.Type, err
+	return info.UserAuthentication.Type, err
 }
 
 func getInfo(api string, httpClient *http.Client) (*Info, error) {
@@ -204,7 +204,7 @@ func getUAAEndpoint(api string, httpClient *http.Client) (*Endpoint, error) {
 		return DefaultEndpoint(), nil
 	}
 	info, err := getInfo(api, httpClient)
-	URL := info.UserAuthenication.Options.URL
+	URL := info.UserAuthentication.Options.URL
 	return &Endpoint{URL: URL}, err
 }
 
@@ -232,8 +232,22 @@ func (c *Client) DoRequest(r *request) (*http.Response, error) {
 	req.Header.Add("User-Agent", "gogo-bosh")
 	resp, err := c.config.HttpClient.Do(req)
 	if err != nil {
+		log.Printf("Error in DoRequest: '%v'\n  Err: '%v'\n", r, err)
 		if strings.Contains(err.Error(), "oauth2: cannot fetch token") {
-			c.refreshClient()
+			err = c.refreshClient()
+			if err != nil {
+				log.Printf("Error refreshing UAA client: %s\n", err.Error())
+			}
+			resp, err = c.config.HttpClient.Do(req)
+		}
+	}
+	if resp.StatusCode > 399 {
+		log.Printf("4xx/5xx Code in DoRequest: '%v' - Status: %v \n  Err: '%v'\n", r, err, resp.Status)
+		if strings.Contains(resp.Status, "Unauthorized") {
+			err = c.refreshClient()
+			if err != nil {
+				log.Printf("Error refreshing UAA client from 400: %s\n", err.Error())
+			}
 			resp, err = c.config.HttpClient.Do(req)
 		}
 	}
@@ -271,6 +285,19 @@ func (c *Client) GetInfo() (info Info, err error) {
 }
 
 func (c *Client) refreshClient() error {
+	log.Printf("Refreshing expired UAA token...")
+
+	// Create a new http client to avoid authentication failure when getting a new
+	// token as the oauth2 client passes along the expired/revoked refresh token.
+	c.config.HttpClient = &http.Client{
+		Timeout: c.config.HttpClient.Timeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: c.config.SkipSslValidation,
+			},
+		},
+	}
+
 	ctx := getContext(c.config)
 
 	authConfig, token, err := getToken(ctx, c.config)
