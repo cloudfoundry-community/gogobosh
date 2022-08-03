@@ -104,7 +104,7 @@ func NewClient(config *Config) (*Client, error) {
 
 	authType, err := getAuthType(config.BOSHAddress, config.HttpClient)
 	if err != nil {
-		return nil, fmt.Errorf("Could not get auth type: %v", err)
+		return nil, fmt.Errorf("could not get client auth type: %w", err)
 	}
 	if authType != "uaa" {
 		config.HttpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
@@ -123,7 +123,7 @@ func NewClient(config *Config) (*Client, error) {
 		endpoint, err := getUAAEndpoint(config.BOSHAddress, oauth2.NewClient(ctx, nil))
 
 		if err != nil {
-			return nil, fmt.Errorf("Could not get api /info: %v", err)
+			return nil, fmt.Errorf("could not get api /info: %w", err)
 		}
 
 		config.Endpoint = endpoint
@@ -132,7 +132,7 @@ func NewClient(config *Config) (*Client, error) {
 			authConfig, token, err := getToken(ctx, *config)
 
 			if err != nil {
-				return nil, fmt.Errorf("Error getting token: %v", err)
+				return nil, fmt.Errorf("error getting token: %w", err)
 			}
 
 			config.TokenSource = authConfig.TokenSource(ctx, token)
@@ -188,7 +188,7 @@ func getInfo(api string, httpClient *http.Client) (*Info, error) {
 		log.Printf("Error requesting info %v", err)
 		return &Info{}, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -236,17 +236,19 @@ func (c *Client) DoRequest(r *request) (*http.Response, error) {
 		if strings.Contains(err.Error(), "oauth2: cannot fetch token") {
 			err = c.refreshClient()
 			if err != nil {
-				log.Printf("Error refreshing UAA client: %s\n", err.Error())
+				return nil, fmt.Errorf("error refreshing UAA client: %w", err)
 			}
 			resp, err = c.config.HttpClient.Do(req)
+		} else {
+			// errors are only returned for very bad things, not 400s etc
+			return nil, fmt.Errorf("error making bosh client http request: %w", err)
 		}
-	}
-	if resp.StatusCode > 399 {
+	} else if resp.StatusCode >= 400 {
 		log.Printf("4xx/5xx Code in DoRequest: '%v' - Status: %v \n  Err: '%v'\n", r, err, resp.Status)
 		if strings.Contains(resp.Status, "Unauthorized") {
 			err = c.refreshClient()
 			if err != nil {
-				log.Printf("Error refreshing UAA client from 400: %s\n", err.Error())
+				return nil, fmt.Errorf("error refreshing UAA client from 400: %w", err)
 			}
 			resp, err = c.config.HttpClient.Do(req)
 		}
@@ -254,34 +256,42 @@ func (c *Client) DoRequest(r *request) (*http.Response, error) {
 	return resp, err
 }
 
-// UUID return uuid
+// GetUUID returns the BOSH UUID
+func (c *Client) GetUUID() (string, error) {
+	info, err := c.GetInfo()
+	if err != nil {
+		return "", fmt.Errorf("error getting the UUID: %w", err)
+	}
+	return info.UUID, nil
+}
+
+// UUID returns the BOSH uuid
+// Deprecated: Use GetUUID and check for errors
 func (c *Client) UUID() string {
-	info, _ := c.GetInfo()
-	return info.UUID
+	uuid, _ := c.GetUUID()
+	return uuid
 }
 
 // GetInfo returns BOSH Info
-func (c *Client) GetInfo() (info Info, err error) {
+func (c *Client) GetInfo() (Info, error) {
 	r := c.NewRequest("GET", "/info")
 	resp, err := c.DoRequest(r)
-
 	if err != nil {
-		log.Printf("Error requesting info %v", err)
-		return
+		return Info{}, fmt.Errorf("error requesting info: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading info request %v", resBody)
-		return
+		return Info{}, fmt.Errorf("error reading info response: %w", err)
 	}
+
+	var info Info
 	err = json.Unmarshal(resBody, &info)
 	if err != nil {
-		log.Printf("Error unmarshaling info %v", err)
-		return
+		return Info{}, fmt.Errorf("error unmarshalling info response: %w", err)
 	}
-	return
+	return info, nil
 }
 
 func (c *Client) refreshClient() error {
@@ -302,7 +312,7 @@ func (c *Client) refreshClient() error {
 
 	authConfig, token, err := getToken(ctx, c.config)
 	if err != nil {
-		return fmt.Errorf("Error getting token: %v", err)
+		return fmt.Errorf("error getting token to refresh client: %w", err)
 	}
 
 	c.config.TokenSource = authConfig.TokenSource(ctx, token)
@@ -357,7 +367,7 @@ func (r *request) toHTTP() (*http.Request, error) {
 func (c *Client) GetToken() (string, error) {
 	token, err := c.config.TokenSource.Token()
 	if err != nil {
-		return "", fmt.Errorf("Error getting bearer token: %v", err)
+		return "", fmt.Errorf("error getting bearer token: %w", err)
 	}
 	return "bearer " + token.AccessToken, nil
 }

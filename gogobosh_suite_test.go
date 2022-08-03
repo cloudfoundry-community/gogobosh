@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestBoshclient(t *testing.T) {
+func TestBoshClient(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Boshclient Suite")
+	RunSpecs(t, "BoshClient Suite")
 }
