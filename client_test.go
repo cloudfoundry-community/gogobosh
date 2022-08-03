@@ -115,7 +115,7 @@ var _ = Describe("Client", func() {
 					Expect(err).Should(BeNil())
 					Expect(token).Should(Equal("bearer foobar2"))
 					token, err = client.GetToken()
-					Expect(err).Should(MatchError("Error getting bearer token: oauth2: cannot fetch token: 401 Unauthorized\nResponse: {\"error\":\"invalid_token\",\"error_description\":\"Invalid refresh token (expired)\"}"))
+					Expect(err).Should(MatchError("error getting bearer token: oauth2: cannot fetch token: 401 Unauthorized\nResponse: {\"error\":\"invalid_token\",\"error_description\":\"Invalid refresh token (expired)\"}"))
 					Expect(token).Should(Equal(""))
 				})
 			})

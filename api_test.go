@@ -245,7 +245,7 @@ var _ = Describe("Api", func() {
 				Expect(vms[0].Processes[0].Mem.Percent).Should(Equal(16.5))
 				Expect(vms[0].Processes[0].State).Should(Equal("running"))
 				Expect(vms[0].Processes[0].Uptime.Secs).Should(Equal(11794845))
-				Expect(vms[0].ResurectionPaused).Should(BeFalse())
+				Expect(vms[0].ResurrectionPaused).Should(BeFalse())
 				Expect(vms[0].AZ).Should(Equal("z1"))
 				Expect(vms[0].ID).Should(Equal("4a9278c8-e93a-4d6a-b22c-13560208da9e"))
 				Expect(vms[0].Bootstrap).Should(BeTrue())

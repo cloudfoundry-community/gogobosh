@@ -12,32 +12,31 @@ import (
 	"time"
 )
 
+const maxRetries = 360 // equates to 5m with 1s sleep
+
 // GetStemcells from given BOSH
 func (c *Client) GetStemcells() ([]Stemcell, error) {
 	r := c.NewRequest("GET", "/stemcells")
 	resp, err := c.DoRequest(r)
 	if err != nil {
-		log.Printf("Error requesting stemcells  %v", err)
-		return nil, err
+		return []Stemcell{}, fmt.Errorf("error requesting stemcells: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading stemcells request %v", resBody)
-		return nil, err
+		return []Stemcell{}, fmt.Errorf("error reading stemcells response: %w", err)
 	}
 
-	stemcells := []Stemcell{}
+	var stemcells []Stemcell
 	err = json.Unmarshal(resBody, &stemcells)
 	if err != nil {
-		log.Printf("Error unmarshaling stemcells %v", err)
+		return []Stemcell{}, fmt.Errorf("error unmarshalling stemcells response: %w", err)
 	}
-	return stemcells, err
+	return stemcells, nil
 }
 
 func (c *Client) UploadStemcell(url, sha1 string) (Task, error) {
-	task := Task{}
 	r := c.NewRequest("POST", "/stemcells")
 	in := struct {
 		Location string `json:"location"`
@@ -49,7 +48,7 @@ func (c *Client) UploadStemcell(url, sha1 string) (Task, error) {
 
 	b, err := json.Marshal(&in)
 	if err != nil {
-		return task, err
+		return Task{}, fmt.Errorf("error marshalling upload request: %w", err)
 	}
 
 	r.body = bytes.NewBuffer(b)
@@ -57,50 +56,46 @@ func (c *Client) UploadStemcell(url, sha1 string) (Task, error) {
 
 	resp, err := c.DoRequest(r)
 	if err != nil {
-		log.Printf("Error requesting stemcell upload %v", err)
-		return task, err
+		return Task{}, fmt.Errorf("error requesting stemcell upload: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading task request %v", resBody)
-		return task, err
+		return Task{}, fmt.Errorf("error reading stemcell upload response: %w", err)
 	}
+
+	var task Task
 	err = json.Unmarshal(resBody, &task)
 	if err != nil {
-		log.Printf("Error unmarshaling task %v", err)
+		return Task{}, fmt.Errorf("error unmarshaling stemcell upload response: %w", err)
 	}
-	return task, err
+	return task, nil
 }
 
 // GetReleases from given BOSH
 func (c *Client) GetReleases() ([]Release, error) {
 	r := c.NewRequest("GET", "/releases")
 	resp, err := c.DoRequest(r)
-
 	if err != nil {
-		log.Printf("Error requesting releases  %v", err)
-		return nil, err
+		return []Release{}, fmt.Errorf("error requesting releases: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading releases request %v", resBody)
-		return nil, err
+		return []Release{}, fmt.Errorf("error reading releases response: %w", err)
 	}
 
-	releases := []Release{}
+	var releases []Release
 	err = json.Unmarshal(resBody, &releases)
 	if err != nil {
-		log.Printf("Error unmarshaling releases %v", err)
+		return []Release{}, fmt.Errorf("error unmarshalling releases response: %w", err)
 	}
-	return releases, err
+	return releases, nil
 }
 
 func (c *Client) UploadRelease(url, sha1 string) (Task, error) {
-	task := Task{}
 	r := c.NewRequest("POST", "/releases")
 	in := struct {
 		Location string `json:"location"`
@@ -112,7 +107,7 @@ func (c *Client) UploadRelease(url, sha1 string) (Task, error) {
 
 	b, err := json.Marshal(&in)
 	if err != nil {
-		return task, err
+		return Task{}, fmt.Errorf("error marshalling upload release request: %w", err)
 	}
 
 	r.body = bytes.NewBuffer(b)
@@ -120,100 +115,95 @@ func (c *Client) UploadRelease(url, sha1 string) (Task, error) {
 
 	resp, err := c.DoRequest(r)
 	if err != nil {
-		log.Printf("Error requesting release upload %v", err)
-		return task, err
+		return Task{}, fmt.Errorf("error requesting release upload: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading task request %v", resBody)
-		return task, err
+		return Task{}, fmt.Errorf("error reading upload release task response: %w", err)
 	}
+
+	var task Task
 	err = json.Unmarshal(resBody, &task)
 	if err != nil {
-		log.Printf("Error unmarshaling task %v", err)
+		return Task{}, fmt.Errorf("error unmarshalling upload release task response: %w", err)
 	}
-	return task, err
+	return task, nil
 }
 
 // GetDeployments from given BOSH
 func (c *Client) GetDeployments() ([]Deployment, error) {
 	r := c.NewRequest("GET", "/deployments")
 	resp, err := c.DoRequest(r)
-
 	if err != nil {
-		log.Printf("Error requesting deployments  %v", err)
-		return nil, err
+		return []Deployment{}, fmt.Errorf("error requesting deployments: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading deployments request %v", resBody)
-		return nil, err
+		return []Deployment{}, fmt.Errorf("error reading deployments response: %w", err)
 	}
-	deployments := []Deployment{}
+
+	var deployments []Deployment
 	err = json.Unmarshal(resBody, &deployments)
 	if err != nil {
-		log.Printf("Error unmarshaling deployments %v", err)
+		return []Deployment{}, fmt.Errorf("error unmarshalling deployments response: %w", err)
 	}
-	return deployments, err
+	return deployments, nil
 }
 
 // GetDeployment from given BOSH
 func (c *Client) GetDeployment(name string) (Manifest, error) {
-	manifest := Manifest{}
 	r := c.NewRequest("GET", "/deployments/"+name)
 	resp, err := c.DoRequest(r)
 
 	if err != nil {
-		log.Printf("Error requesting deployment manifest %v", err)
-		return manifest, err
+		return Manifest{}, fmt.Errorf("error requesting deployment manifest: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading deployment manifest request %v", resBody)
-		return manifest, err
+		return Manifest{}, fmt.Errorf("error reading deployment manifest response: %w", err)
 	}
+
+	var manifest Manifest
 	err = json.Unmarshal(resBody, &manifest)
 	if err != nil {
-		log.Printf("Error unmarshaling deployment manifest %v", err)
+		return Manifest{}, fmt.Errorf("error unmarshalling deployment manifest response: %w", err)
 	}
-	return manifest, err
+	return manifest, nil
 }
 
 // DeleteDeployment from given BOSH
 func (c *Client) DeleteDeployment(name string) (Task, error) {
-	var task Task
 	resp, err := c.DoRequest(c.NewRequest("DELETE", "/deployments/"+name))
 	if err != nil {
-		log.Printf("Error requesting deleting deployment %v", err)
-		return task, err
+		return Task{}, fmt.Errorf("error deleting deployment: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == 404 {
-		return task, fmt.Errorf("deployment %s not found", name)
+		return Task{}, fmt.Errorf("deployment %s not found", name)
 	}
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading task response %v", err)
-		return task, err
+		return Task{}, fmt.Errorf("error reading delete deployment response: %w", err)
 	}
+
+	var task Task
 	err = json.Unmarshal(b, &task)
 	if err != nil {
-		log.Printf("Error unmarshaling task %v", err)
+		return Task{}, fmt.Errorf("error unmarshalling delete deployment response: %w", err)
 	}
-	return task, err
+	return task, nil
 }
 
 // CreateDeployment from given BOSH
 func (c *Client) CreateDeployment(manifest string) (Task, error) {
-	task := Task{}
 	r := c.NewRequest("POST", "/deployments")
 	buffer := bytes.NewBufferString(manifest)
 	r.body = buffer
@@ -222,125 +212,125 @@ func (c *Client) CreateDeployment(manifest string) (Task, error) {
 	resp, err := c.DoRequest(r)
 
 	if err != nil {
-		log.Printf("Error requesting create deployment %v", err)
-		return task, err
+		return Task{}, fmt.Errorf("error creating deployment: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading task response %v", resBody)
-		return task, err
+		return Task{}, fmt.Errorf("error reading create deployment response: %w", err)
 	}
+
+	var task Task
 	err = json.Unmarshal(resBody, &task)
 	if err != nil {
-		log.Printf("Error unmarshaling task %v", err)
+		return Task{}, fmt.Errorf("error unmarshalling create deployment response: %w", err)
 	}
-	return task, err
+	return task, nil
 }
 
 // GetDeploymentVMs from given BOSH
 func (c *Client) GetDeploymentVMs(name string) ([]VM, error) {
-	var task Task
 	r := c.NewRequest("GET", "/deployments/"+name+"/vms?format=full")
 	resp, err := c.DoRequest(r)
 
 	if err != nil {
-		log.Printf("Error requesting deployment vms %v", err)
-		return nil, err
+		return []VM{}, fmt.Errorf("error requesting deployment VMs task: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading deployment vms request %v", resBody)
-		return nil, err
+		return []VM{}, fmt.Errorf("error reading deployment VMs task response: %w", err)
 	}
+
+	var task Task
 	err = json.Unmarshal(resBody, &task)
 	if err != nil {
-		log.Printf("Error unmarshaling tasks %v", err)
-		return nil, err
+		return []VM{}, fmt.Errorf("error unmarshalling deployment VMs task response: %w", err)
 	}
-	for {
+	for i := 0; i <= maxRetries; i++ {
+		if i == maxRetries {
+			return []VM{}, fmt.Errorf("timed out getting deployment VMs task results after %d tries", maxRetries)
+		}
+
 		taskStatus, err := c.GetTask(task.ID)
 		if err != nil {
-			log.Printf("Error getting task %v", err)
+			log.Printf("Error getting task %v, retrying...", err)
 		}
 		if taskStatus.State == "done" {
 			break
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(time.Second)
 	}
 
-	vms := []VM{}
-	output := c.GetTaskResult(task.ID)
+	var vms []VM
+	output, err := c.GetTaskResult(task.ID)
+	if err != nil {
+		return []VM{}, fmt.Errorf("error getting deployment VMs task result: %w", err)
+	}
 	for _, value := range output {
 		if len(value) > 0 {
 			var vm VM
 			err = json.Unmarshal([]byte(value), &vm)
 			if err != nil {
-				log.Printf("Error unmarshaling vms %v %v", value, err)
-				return nil, err
+				return []VM{}, fmt.Errorf("error unmarshalling deployment VMs response: %w", err)
 			}
 			vms = append(vms, vm)
 		}
 	}
-	return vms, err
+	return vms, nil
 }
 
-// GetTasks from given BOSH
+// GetTasksByQuery from given BOSH
 func (c *Client) GetTasksByQuery(query url.Values) ([]Task, error) {
 	requestUrl := "/tasks?" + query.Encode()
 	r := c.NewRequest("GET", requestUrl)
 	resp, err := c.DoRequest(r)
-
 	if err != nil {
-		log.Printf("Error requesting tasks  %v", err)
-		return nil, err
+		return []Task{}, fmt.Errorf("error requesting tasks by query: %w", err)
 	}
-
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading tasks request %v", resBody)
-		return nil, err
+		return []Task{}, fmt.Errorf("error reading tasks by query response: %w", err)
 	}
-	tasks := []Task{}
+
+	var tasks []Task
 	err = json.Unmarshal(resBody, &tasks)
 	if err != nil {
-		log.Printf("Error unmarshaling tasks %v", err)
+		return []Task{}, fmt.Errorf("error unmarshalling tasks by query response: %w", err)
 	}
-	return tasks, err
+	return tasks, nil
 }
 
+// GetTasks retrieves all BOSH tasks
 func (c *Client) GetTasks() ([]Task, error) {
 	return c.GetTasksByQuery(nil)
 }
 
-// GetTask from given BOSH
+// GetTask retrieves the specified task from BOSH
 func (c *Client) GetTask(id int) (Task, error) {
-	task := Task{}
 	stringID := strconv.Itoa(id)
 	r := c.NewRequest("GET", "/tasks/"+stringID)
 	resp, err := c.DoRequest(r)
-
 	if err != nil {
-		log.Printf("Error requesting task %v", err)
-		return task, err
+		return Task{}, fmt.Errorf("error requesting task: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading task request %v", resBody)
-		return task, err
+		return Task{}, fmt.Errorf("error reading task response: %w", err)
 	}
+
+	var task Task
 	err = json.Unmarshal(resBody, &task)
 	if err != nil {
-		log.Printf("Error unmarshaling task %v", err)
+		return Task{}, fmt.Errorf("error unmarshalling task response: %w", err)
 	}
-	return task, err
+	return task, nil
 }
 
 // GetTaskOutput ...
@@ -349,35 +339,35 @@ func (c *Client) GetTaskOutput(id int, typ string) ([]string, error) {
 
 	res, err := c.DoRequest(r)
 	if err != nil {
-		return nil, err
+		return []string{}, fmt.Errorf("error requesting task output: %w", err)
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return []string{}, fmt.Errorf("error reading task output response: %w", err)
 	}
 
 	return strings.Split(strings.TrimSuffix(string(b), "\n"), "\n"), nil
 }
 
 // GetTaskResult from given BOSH
-func (c *Client) GetTaskResult(id int) []string {
-	l, _ := c.GetTaskOutput(id, "result")
-	return l
+func (c *Client) GetTaskResult(id int) ([]string, error) {
+	return c.GetTaskOutput(id, "result")
 }
 
+// GetTaskEvents retrieves the events for the specified task
 func (c *Client) GetTaskEvents(id int) ([]TaskEvent, error) {
 	raw, err := c.GetTaskOutput(id, "event")
 	if err != nil {
-		return nil, err
+		return []TaskEvent{}, fmt.Errorf("error getting the task events: %w", err)
 	}
 
 	events := make([]TaskEvent, len(raw))
 	for i := range raw {
 		err = json.Unmarshal([]byte(raw[i]), &events[i])
 		if err != nil {
-			return nil, err
+			return []TaskEvent{}, fmt.Errorf("error unmarshalling the task events: %w", err)
 		}
 	}
 
@@ -386,8 +376,6 @@ func (c *Client) GetTaskEvents(id int) ([]TaskEvent, error) {
 
 // GetCloudConfig from given BOSH
 func (c *Client) GetCloudConfig(latest bool) ([]Cfg, error) {
-	cfg := []Cfg{}
-
 	qs := "?latest=true"
 	if !latest {
 		qs = "?latest=false"
@@ -395,18 +383,24 @@ func (c *Client) GetCloudConfig(latest bool) ([]Cfg, error) {
 	r := c.NewRequest("GET", "/configs"+qs)
 	resp, err := c.DoRequest(r)
 	if err != nil {
-		return cfg, err
+		return []Cfg{}, fmt.Errorf("error requesting cloud config: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return cfg, err
+		return []Cfg{}, fmt.Errorf("error unmarshalling cloud config response: %w", err)
 	}
-	return cfg, json.Unmarshal(resBody, &cfg)
+
+	var cfg []Cfg
+	err = json.Unmarshal(resBody, &cfg)
+	if err != nil {
+		return []Cfg{}, fmt.Errorf("error unmarshalling the cloud config: %w", err)
+	}
+	return cfg, nil
 }
 
-// UpdateCloudConfig
+// UpdateCloudConfig updates the cloud config with the specified config
 func (c *Client) UpdateCloudConfig(config string) error {
 	r := c.NewRequest("POST", "/configs")
 	in := struct {
@@ -420,7 +414,7 @@ func (c *Client) UpdateCloudConfig(config string) error {
 	}
 	b, err := json.Marshal(&in)
 	if err != nil {
-		return err
+		return fmt.Errorf("error marshalling the cloud config update: %w", err)
 	}
 
 	r.body = bytes.NewBuffer(b)
@@ -428,44 +422,43 @@ func (c *Client) UpdateCloudConfig(config string) error {
 
 	resp, err := c.DoRequest(r)
 	if err != nil {
-		return err
+		return fmt.Errorf("error updating the cloud config: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return nil
 }
 
 //Cleanup will post to the cleanup endpoint of bosh, passing along the removeall flag passed in as a bool
-func (c *Client) Cleanup(removeall bool) (Task, error) {
-	task := Task{}
+func (c *Client) Cleanup(removeAll bool) (Task, error) {
 	r := c.NewRequest("POST", "/cleanup")
 	var requestBody struct {
 		Config struct {
 			RemoveAll bool `json:"remove_all"`
 		} `json:"config"`
 	}
-	requestBody.Config.RemoveAll = removeall
+	requestBody.Config.RemoveAll = removeAll
 	b, err := json.Marshal(&requestBody)
 	if err != nil {
-		return task, err
+		return Task{}, fmt.Errorf("error marshalling the cleanup request: %w", err)
 	}
 	r.body = bytes.NewBuffer(b)
 	r.header["Content-Type"] = "application/json"
 	resp, err := c.DoRequest(r)
 	if err != nil {
-		return task, err
+		return Task{}, fmt.Errorf("error making the cleanup request: %w", err)
 	}
-
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading task request %v", resBody)
-		return task, err
+		return Task{}, fmt.Errorf("error reading the cleanup response: %w", err)
 	}
+
+	var task Task
 	err = json.Unmarshal(resBody, &task)
 	if err != nil {
-		log.Printf("Error unmarshaling task %v", err)
+		return Task{}, fmt.Errorf("error unmarshalling the cleanup response: %w", err)
 	}
 	return task, err
 }
