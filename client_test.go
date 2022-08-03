@@ -100,12 +100,12 @@ var _ = Describe("Client", func() {
 				It("can get brand new uaa token", func() {
 					token, err := client.GetToken()
 					Expect(err).Should(BeNil())
-					Consistently(token).Should(Equal("bearer foobar2"))
+					Expect(token).Should(Equal("bearer foobar2"))
 					_, err = client.GetInfo()
 					Expect(err).Should(BeNil())
 					token, err = client.GetToken()
 					Expect(err).Should(BeNil())
-					Consistently(token).Should(Equal("bearer foobar10"))
+					Expect(token).Should(Equal("bearer foobar6"))
 				})
 			})
 
@@ -113,10 +113,10 @@ var _ = Describe("Client", func() {
 				It("can get brand new uaa token", func() {
 					token, err := client.GetToken()
 					Expect(err).Should(BeNil())
-					Consistently(token).Should(Equal("bearer foobar2"))
+					Expect(token).Should(Equal("bearer foobar2"))
 					token, err = client.GetToken()
 					Expect(err).Should(MatchError("Error getting bearer token: oauth2: cannot fetch token: 401 Unauthorized\nResponse: {\"error\":\"invalid_token\",\"error_description\":\"Invalid refresh token (expired)\"}"))
-					Consistently(token).Should(Equal(""))
+					Expect(token).Should(Equal(""))
 				})
 			})
 		})
@@ -139,7 +139,7 @@ var _ = Describe("Client", func() {
 			It("can refresh its uaa token", func() {
 				token, err := client.GetToken()
 				Expect(err).Should(BeNil())
-				Consistently(token).Should(Equal("bearer foobar2"))
+				Expect(token).Should(Equal("bearer foobar2"))
 			})
 		})
 	})
