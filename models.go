@@ -2,11 +2,11 @@ package gogobosh
 
 // Info struct
 type Info struct {
-	Name              string            `json:"name"`
-	UUID              string            `json:"uuid"`
-	Version           string            `json:"version"`
-	User              string            `json:"user"`
-	CPI               string            `json:"cpi"`
+	Name               string             `json:"name"`
+	UUID               string             `json:"uuid"`
+	Version            string             `json:"version"`
+	User               string             `json:"user"`
+	CPI                string             `json:"cpi"`
 	UserAuthentication UserAuthentication `json:"user_authentication"`
 }
 
@@ -188,8 +188,9 @@ type TaskEvent struct {
 
 // Cfg struct
 type Cfg struct {
+	ID        string `json:"id"`
 	Name      string `json:"name"`
-	Type      string `json:"name"`
+	Type      string `json:"type"`
 	Content   string `json:"content"`
 	CreatedAt int    `json:"int"`
 	Deleted   bool   `json:"deleted"`

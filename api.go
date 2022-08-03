@@ -379,8 +379,8 @@ func (c *Client) GetTaskEvents(id int) ([]TaskEvent, error) {
 }
 
 // GetCloudConfig from given BOSH
-func (c *Client) GetCloudConfig(latest bool) (Cfg, error) {
-	cfg := Cfg{}
+func (c *Client) GetCloudConfig(latest bool) ([]Cfg, error) {
+	cfg := []Cfg{}
 
 	qs := "?latest=true"
 	if !latest {
