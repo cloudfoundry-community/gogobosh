@@ -334,7 +334,7 @@ func getToken(ctx context.Context, config Config) (*oauth2.Config, *oauth2.Token
 }
 
 func getContext(config Config) context.Context {
-	return context.WithValue(oauth2.NoContext, oauth2.HTTPClient, config.HttpClient)
+	return context.WithValue(context.Background(), oauth2.HTTPClient, config.HttpClient)
 }
 
 // toHTTP converts the request to an HTTP request
