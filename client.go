@@ -362,13 +362,6 @@ func (c *Client) GetToken() (string, error) {
 	return "bearer " + token.AccessToken, nil
 }
 
-// decodeBody is used to JSON decode a body
-func decodeBody(resp *http.Response, out interface{}) error {
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	return dec.Decode(out)
-}
-
 // encodeBody is used to encode a request body
 func encodeBody(obj interface{}) (io.Reader, error) {
 	buf := bytes.NewBuffer(nil)
