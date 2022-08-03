@@ -16,12 +16,12 @@ import (
 func (c *Client) GetStemcells() ([]Stemcell, error) {
 	r := c.NewRequest("GET", "/stemcells")
 	resp, err := c.DoRequest(r)
-	defer resp.Body.Close()
-
 	if err != nil {
 		log.Printf("Error requesting stemcells  %v", err)
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading stemcells request %v", resBody)

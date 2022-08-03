@@ -334,7 +334,7 @@ func getToken(ctx context.Context, config Config) (*oauth2.Config, *oauth2.Token
 }
 
 func getContext(config Config) context.Context {
-	return context.WithValue(oauth2.NoContext, oauth2.HTTPClient, config.HttpClient)
+	return context.WithValue(context.Background(), oauth2.HTTPClient, config.HttpClient)
 }
 
 // toHTTP converts the request to an HTTP request
@@ -360,13 +360,6 @@ func (c *Client) GetToken() (string, error) {
 		return "", fmt.Errorf("Error getting bearer token: %v", err)
 	}
 	return "bearer " + token.AccessToken, nil
-}
-
-// decodeBody is used to JSON decode a body
-func decodeBody(resp *http.Response, out interface{}) error {
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	return dec.Decode(out)
 }
 
 // encodeBody is used to encode a request body

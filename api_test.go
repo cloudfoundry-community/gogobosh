@@ -145,7 +145,7 @@ var _ = Describe("Api", func() {
 
 		Describe("Test tasks by query", func() {
 			BeforeEach(func() {
-				setup(MockRoute{"GET", "/tasks?state=processing", tasks, ""}, "basic")
+				setup(MockRoute{"GET", "/tasks", tasks, ""}, "basic")
 				config := &Config{
 					BOSHAddress: server.URL,
 					Username:    "admin",
