@@ -1,6 +1,6 @@
 module github.com/cloudfoundry-community/gogobosh
 
-go 1.18
+go 1.17
 
 require (
 	github.com/go-martini/martini v0.0.0-20160404082044-b174c4f35f9f
