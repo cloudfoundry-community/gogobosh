@@ -429,7 +429,7 @@ func (c *Client) UpdateCloudConfig(config string) error {
 	return nil
 }
 
-//Cleanup will post to the cleanup endpoint of bosh, passing along the removeall flag passed in as a bool
+// Cleanup will post to the cleanup endpoint of bosh, passing along the removeAll flag passed in as a bool
 func (c *Client) Cleanup(removeAll bool) (Task, error) {
 	r := c.NewRequest("POST", "/cleanup")
 	var requestBody struct {
@@ -461,4 +461,66 @@ func (c *Client) Cleanup(removeAll bool) (Task, error) {
 		return Task{}, fmt.Errorf("error unmarshalling the cleanup response: %w", err)
 	}
 	return task, err
+}
+
+func (c *Client) Restart(deployment, instance string) error {
+	return nil
+}
+
+func (c *Client) Stop(deployment, jobName, vmID string) error {
+	// /deployments/cf-f9cc327448912298c6ef/jobs/router/3fc7759a-c453-448c-97b6-844c85029f02?state=stopped
+	return c.doStop(jobName, vmID, fmt.Sprintf("/deployments/%s/jobs/%s/%s?state=stopped", deployment, jobName, vmID))
+}
+
+func (c *Client) StopNoConverge(deployment, jobName, vmID string) error {
+	// /deployments/cf-f9cc327448912298c6ef/instance_groups/router/3fc7759a-c453-448c-97b6-844c85029f02/actions/stop
+	return c.doStop(jobName, vmID, fmt.Sprintf("/deployments/%s/instance_groups/%s/%s/actions/stop", deployment, jobName, vmID))
+}
+
+func (c *Client) Start(deployment, instanceName string) error {
+	return nil
+}
+
+func (c *Client) doStop(jobName, vmID, stopPath string) error {
+	r := c.NewRequest("PUT", stopPath)
+	resp, err := c.DoRequest(r)
+
+	if err != nil {
+		return fmt.Errorf("error creating VM stop task: %w", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading VM stop task response: %w", err)
+	}
+
+	var task Task
+	err = json.Unmarshal(resBody, &task)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling VM stop task response: %w", err)
+	}
+
+	// TODO: extract this retry somewhere
+	// TODO: 10m enough? Too much?
+	const maxTries = 600 // 10m
+	for i := 0; i <= maxTries; i++ {
+		if i == maxTries {
+			return fmt.Errorf("timed out getting VM stop task results after %d tries", maxRetries)
+		}
+
+		taskStatus, err := c.GetTask(task.ID)
+		if err != nil {
+			log.Printf("Error getting task %v, retrying...", err)
+		}
+		if taskStatus.State == "done" {
+			break
+		}
+		if taskStatus.State == "error" {
+			return fmt.Errorf("error occurred stopping instance %s/%s", jobName, vmID)
+		}
+		time.Sleep(time.Second)
+	}
+
+	return nil
 }

@@ -253,5 +253,59 @@ var _ = Describe("Api", func() {
 			})
 		})
 
+		Describe("Test stop instance", func() {
+			BeforeEach(func() {
+				setupMultiple([]MockRoute{
+					{"PUT", "/deployments/deployment-foo/jobs/job-foo/id-foo", "", server.URL + "/tasks/3"},
+					{"GET", "/tasks/3", task3, ""},
+					{"GET", "/tasks/3", task3, ""},
+				}, "basic")
+
+				config := &Config{
+					BOSHAddress: server.URL,
+					Username:    "admin",
+					Password:    "admin",
+				}
+
+				client, _ = NewClient(config)
+			})
+
+			AfterEach(func() {
+				teardown()
+			})
+
+			It("can stop an instance", func() {
+				err := client.Stop("deployment-foo", "job-foo", "id-foo")
+				Expect(err).Should(BeNil())
+			})
+		})
+
+		Describe("Test stop instance no converge", func() {
+			BeforeEach(func() {
+				setupMultiple([]MockRoute{
+					{"PUT", "/deployments/deployment-foo/instance_groups/job-foo/id-foo/actions/stop", "", server.URL + "/tasks/3"},
+					{"GET", "/tasks/3", task3, ""},
+					{"GET", "/tasks/3", task3, ""},
+				}, "basic")
+
+				config := &Config{
+					BOSHAddress: server.URL,
+					Username:    "admin",
+					Password:    "admin",
+				}
+
+				client, _ = NewClient(config)
+			})
+
+			AfterEach(func() {
+				teardown()
+			})
+
+			It("can stop an instance", func() {
+				err := client.StopNoConverge("deployment-foo", "job-foo", "id-foo")
+				Expect(err).Should(BeNil())
+			})
+		})
+
 	})
 })
