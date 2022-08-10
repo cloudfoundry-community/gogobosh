@@ -524,3 +524,44 @@ func (c *Client) doStop(jobName, vmID, stopPath string) error {
 
 	return nil
 }
+
+func (c *Client) WaitUntilDone(task Task, timeout time.Duration) (Task, error) {
+	type Result struct {
+		Task  Task
+		Error error
+	}
+	doneCh := make(chan Result)
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
+	go func(taskID int) {
+		for range ticker.C {
+			curTask, err := c.GetTask(taskID)
+			if err != nil {
+				log.Printf("Failed getting task %d status, retrying: %s", taskID, err)
+			}
+			switch curTask.State {
+			case "done":
+				doneCh <- Result{
+					Task: curTask,
+				}
+				return
+			case "error":
+				doneCh <- Result{
+					Task:  curTask,
+					Error: fmt.Errorf("task %d failed: %s", curTask.ID, curTask.Result),
+				}
+				return
+			}
+		}
+	}(task.ID)
+
+	for {
+		select {
+		case result := <-doneCh:
+			return result.Task, result.Error
+		case <-time.After(timeout):
+			return task, fmt.Errorf("timed out waiting for task %d to complete", task.ID)
+		}
+	}
+}

@@ -19,6 +19,10 @@ build:
 test: ## Run the unit tests
 	go test -short ./...
 
+.PHONY: test-integration
+test-integration: ## Run integration tests only
+	go test -timeout 15m -v -tags integration ./integration_test.go
+
 .PHONY: coverage
 coverage: ## Run the tests with coverage and race detection
 	go test -v --race -coverprofile=c.out -covermode=atomic ./...
