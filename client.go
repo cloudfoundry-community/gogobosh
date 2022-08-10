@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -174,10 +173,6 @@ func getAuthType(api string, httpClient *http.Client) (string, error) {
 }
 
 func getInfo(api string, httpClient *http.Client) (*Info, error) {
-	var (
-		info Info
-	)
-
 	if api == "" {
 		return &Info{}, nil
 	}
@@ -188,11 +183,11 @@ func getInfo(api string, httpClient *http.Client) (*Info, error) {
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	resBody, err := ioutil.ReadAll(resp.Body)
+	var info Info
+	err = json.NewDecoder(resp.Body).Decode(&info)
 	if err != nil {
-		return &Info{}, err
+		return &Info{}, fmt.Errorf("error unmarshalling info response: %w", err)
 	}
-	err = json.Unmarshal(resBody, &info)
 	return &info, err
 }
 
@@ -285,24 +280,11 @@ func (c *Client) UUID() string {
 
 // GetInfo returns BOSH Info
 func (c *Client) GetInfo() (Info, error) {
-	r := c.NewRequest("GET", "/info")
-	resp, err := c.DoRequest(r)
+	info, err := getInfo(c.config.BOSHAddress, c.config.HttpClient)
 	if err != nil {
-		return Info{}, fmt.Errorf("error requesting info: %w", err)
+		return Info{}, err
 	}
-	defer func() { _ = resp.Body.Close() }()
-
-	resBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return Info{}, fmt.Errorf("error reading info response: %w", err)
-	}
-
-	var info Info
-	err = json.Unmarshal(resBody, &info)
-	if err != nil {
-		return Info{}, fmt.Errorf("error unmarshalling info response: %w", err)
-	}
-	return info, nil
+	return *info, nil
 }
 
 func (c *Client) refreshClient() error {
