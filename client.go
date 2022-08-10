@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -175,27 +173,21 @@ func getAuthType(api string, httpClient *http.Client) (string, error) {
 }
 
 func getInfo(api string, httpClient *http.Client) (*Info, error) {
-	var (
-		info Info
-	)
-
 	if api == "" {
 		return &Info{}, nil
 	}
 
 	resp, err := httpClient.Get(api + "/info")
 	if err != nil {
-		log.Printf("Error requesting info %v", err)
 		return &Info{}, err
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	resBody, err := ioutil.ReadAll(resp.Body)
+	var info Info
+	err = json.NewDecoder(resp.Body).Decode(&info)
 	if err != nil {
-		log.Printf("Error reading info request %v", resBody)
-		return &Info{}, err
+		return &Info{}, fmt.Errorf("error unmarshalling info response: %w", err)
 	}
-	err = json.Unmarshal(resBody, &info)
 	return &info, err
 }
 
@@ -219,6 +211,20 @@ func (c *Client) NewRequest(method, path string) *request {
 	return r
 }
 
+func (c *Client) DoRequestAndUnmarshal(r *request, objPtr interface{}) error {
+	resp, err := c.DoRequest(r)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	err = json.NewDecoder(resp.Body).Decode(objPtr)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling http response: %w", err)
+	}
+	return nil
+}
+
 // DoRequest runs a request with our client
 func (c *Client) DoRequest(r *request) (*http.Response, error) {
 	req, err := r.toHTTP()
@@ -232,7 +238,6 @@ func (c *Client) DoRequest(r *request) (*http.Response, error) {
 	req.Header.Add("User-Agent", "gogo-bosh")
 	resp, err := c.config.HttpClient.Do(req)
 	if err != nil {
-		log.Printf("Error in DoRequest: '%v'\n  Err: '%v'\n", r, err)
 		if strings.Contains(err.Error(), "oauth2: cannot fetch token") {
 			err = c.refreshClient()
 			if err != nil {
@@ -244,13 +249,14 @@ func (c *Client) DoRequest(r *request) (*http.Response, error) {
 			return nil, fmt.Errorf("error making bosh client http request: %w", err)
 		}
 	} else if resp.StatusCode >= 400 {
-		log.Printf("4xx/5xx Code in DoRequest: '%v' - Status: %v \n  Err: '%v'\n", r, err, resp.Status)
 		if strings.Contains(resp.Status, "Unauthorized") {
 			err = c.refreshClient()
 			if err != nil {
 				return nil, fmt.Errorf("error refreshing UAA client from 400: %w", err)
 			}
 			resp, err = c.config.HttpClient.Do(req)
+		} else {
+			return nil, fmt.Errorf("http %s request to %s failed with %s", req.Method, req.URL, resp.Status)
 		}
 	}
 	return resp, err
@@ -274,29 +280,14 @@ func (c *Client) UUID() string {
 
 // GetInfo returns BOSH Info
 func (c *Client) GetInfo() (Info, error) {
-	r := c.NewRequest("GET", "/info")
-	resp, err := c.DoRequest(r)
+	info, err := getInfo(c.config.BOSHAddress, c.config.HttpClient)
 	if err != nil {
-		return Info{}, fmt.Errorf("error requesting info: %w", err)
+		return Info{}, err
 	}
-	defer func() { _ = resp.Body.Close() }()
-
-	resBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return Info{}, fmt.Errorf("error reading info response: %w", err)
-	}
-
-	var info Info
-	err = json.Unmarshal(resBody, &info)
-	if err != nil {
-		return Info{}, fmt.Errorf("error unmarshalling info response: %w", err)
-	}
-	return info, nil
+	return *info, nil
 }
 
 func (c *Client) refreshClient() error {
-	log.Printf("Refreshing expired UAA token...")
-
 	// Create a new http client to avoid authentication failure when getting a new
 	// token as the oauth2 client passes along the expired/revoked refresh token.
 	c.config.HttpClient = &http.Client{

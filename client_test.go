@@ -22,7 +22,7 @@ var _ = Describe("Client", func() {
 		var client *Client
 
 		BeforeEach(func() {
-			setup(MockRoute{"GET", "/stemcells", `{}`, ""}, "basic")
+			setup("basic")
 			config := &Config{
 				BOSHAddress: server.URL,
 				Username:    "admin",
@@ -52,7 +52,7 @@ var _ = Describe("Client", func() {
 		var client *Client
 
 		BeforeEach(func() {
-			setup(MockRoute{"GET", "/stemcells", `{}`, ""}, "uaa")
+			setup("uaa")
 			config := &Config{
 				BOSHAddress: server.URL,
 				Username:    "admin",
@@ -83,7 +83,7 @@ var _ = Describe("Client", func() {
 
 		Context("when the refresh token has expired", func() {
 			BeforeEach(func() {
-				setup(MockRoute{"GET", "/stemcells", `{}`, ""}, "uaa")
+				setupMockRoute(MockRoute{"GET", "/stemcells", `[]`, ""}, "uaa")
 				config := &Config{
 					BOSHAddress: server.URL,
 					Username:    "admin",
@@ -101,7 +101,7 @@ var _ = Describe("Client", func() {
 					token, err := client.GetToken()
 					Expect(err).Should(BeNil())
 					Expect(token).Should(Equal("bearer foobar2"))
-					_, err = client.GetInfo()
+					_, err = client.GetStemcells()
 					Expect(err).Should(BeNil())
 					token, err = client.GetToken()
 					Expect(err).Should(BeNil())
@@ -123,7 +123,7 @@ var _ = Describe("Client", func() {
 
 		Context("when the refresh token is valid", func() {
 			BeforeEach(func() {
-				setup(MockRoute{"GET", "/stemcells", `{}`, ""}, "uaa")
+				setup("uaa")
 				config := &Config{
 					BOSHAddress: server.URL,
 					Username:    "admin",

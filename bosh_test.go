@@ -23,11 +23,15 @@ type MockRoute struct {
 	Redirect string
 }
 
-func setup(mock MockRoute, authType string) {
-	setupMultiple([]MockRoute{mock}, authType)
+func setup(authType string) {
+	setupMockRoute(MockRoute{}, authType)
 }
 
-func setupMultiple(mockEndpoints []MockRoute, authType string) {
+func setupMockRoute(mock MockRoute, authType string) {
+	setupMockRoutes([]MockRoute{mock}, authType)
+}
+
+func setupMockRoutes(mockEndpoints []MockRoute, authType string) {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
 	fakeUAAServer = FakeUAAServer()
@@ -39,15 +43,16 @@ func setupMultiple(mockEndpoints []MockRoute, authType string) {
 		endpoint := mock.Endpoint
 		output := mock.Output
 		redirect := mock.Redirect
-		if redirect != "" {
-			r.Get(endpoint, func(r render.Render) {
-				r.Redirect(redirect)
-			})
-		}
 		if method == "GET" {
-			r.Get(endpoint, func() string {
-				return output
-			})
+			if redirect != "" {
+				r.Get(endpoint, func(r render.Render) {
+					r.Redirect(redirect)
+				})
+			} else {
+				r.Get(endpoint, func() string {
+					return output
+				})
+			}
 		} else if method == "POST" {
 			r.Post(endpoint, func() string {
 				return output
@@ -56,6 +61,16 @@ func setupMultiple(mockEndpoints []MockRoute, authType string) {
 			r.Delete(endpoint, func() (int, string) {
 				return 204, output
 			})
+		} else if method == "PUT" {
+			if redirect != "" {
+				r.Put(endpoint, func(r render.Render) {
+					r.Redirect(redirect)
+				})
+			} else {
+				r.Put(endpoint, func() (int, string) {
+					return 200, output
+				})
+			}
 		}
 	}
 	if authType != "uaa" {

@@ -13,7 +13,7 @@ var _ = Describe("Api", func() {
 
 		Describe("Test get stemcells", func() {
 			BeforeEach(func() {
-				setup(MockRoute{"GET", "/stemcells", stemcells, ""}, "basic")
+				setupMockRoute(MockRoute{"GET", "/stemcells", stemcells, ""}, "basic")
 				config := &Config{
 					BOSHAddress: server.URL,
 					Username:    "admin",
@@ -39,7 +39,7 @@ var _ = Describe("Api", func() {
 
 		Describe("Test get releases", func() {
 			BeforeEach(func() {
-				setup(MockRoute{"GET", "/releases", releases, ""}, "basic")
+				setupMockRoute(MockRoute{"GET", "/releases", releases, ""}, "basic")
 				config := &Config{
 					BOSHAddress: server.URL,
 					Username:    "admin",
@@ -68,7 +68,7 @@ var _ = Describe("Api", func() {
 		Describe("Test deployments", func() {
 			Describe("get deployments", func() {
 				BeforeEach(func() {
-					setup(MockRoute{"GET", "/deployments", deployments, ""}, "basic")
+					setupMockRoute(MockRoute{"GET", "/deployments", deployments, ""}, "basic")
 					config := &Config{
 						BOSHAddress: server.URL,
 						Username:    "admin",
@@ -96,7 +96,7 @@ var _ = Describe("Api", func() {
 
 			Describe("create deployments", func() {
 				BeforeEach(func() {
-					setup(MockRoute{"POST", "/deployments", deploymentTask, ""}, "basic")
+					setupMockRoute(MockRoute{"POST", "/deployments", deploymentTask, ""}, "basic")
 					config := &Config{
 						BOSHAddress: server.URL,
 						Username:    "admin",
@@ -120,7 +120,7 @@ var _ = Describe("Api", func() {
 
 		Describe("Test tasks", func() {
 			BeforeEach(func() {
-				setup(MockRoute{"GET", "/tasks", tasks, ""}, "basic")
+				setupMockRoute(MockRoute{"GET", "/tasks", tasks, ""}, "basic")
 				config := &Config{
 					BOSHAddress: server.URL,
 					Username:    "admin",
@@ -145,7 +145,7 @@ var _ = Describe("Api", func() {
 
 		Describe("Test tasks by query", func() {
 			BeforeEach(func() {
-				setup(MockRoute{"GET", "/tasks", tasks, ""}, "basic")
+				setupMockRoute(MockRoute{"GET", "/tasks", tasks, ""}, "basic")
 				config := &Config{
 					BOSHAddress: server.URL,
 					Username:    "admin",
@@ -172,7 +172,7 @@ var _ = Describe("Api", func() {
 
 		Describe("Test get deployment manifest", func() {
 			BeforeEach(func() {
-				setup(MockRoute{"GET", "/deployments/foo", manifest, ""}, "basic")
+				setupMockRoute(MockRoute{"GET", "/deployments/foo", manifest, ""}, "basic")
 				config := &Config{
 					BOSHAddress: server.URL,
 					Username:    "admin",
@@ -195,7 +195,7 @@ var _ = Describe("Api", func() {
 
 		Describe("Test get deployment vms", func() {
 			BeforeEach(func() {
-				setupMultiple([]MockRoute{
+				setupMockRoutes([]MockRoute{
 					{"GET", "/deployments/foo/vms", "", server.URL + "/tasks/2"},
 					{"GET", "/tasks/2", task, ""},
 					{"GET", "/tasks/2", task, ""},
@@ -250,6 +250,62 @@ var _ = Describe("Api", func() {
 				Expect(vms[0].ID).Should(Equal("4a9278c8-e93a-4d6a-b22c-13560208da9e"))
 				Expect(vms[0].Bootstrap).Should(BeTrue())
 				Expect(vms[0].Ignore).Should(BeFalse())
+			})
+		})
+
+		Describe("Test stop instance", func() {
+			BeforeEach(func() {
+				setupMockRoutes([]MockRoute{
+					{"PUT", "/deployments/deployment-foo/jobs/job-foo/id-foo", "", server.URL + "/tasks/3"},
+					{"GET", "/tasks/3", task3, ""},
+					{"GET", "/tasks/3", task3, ""},
+				}, "basic")
+
+				config := &Config{
+					BOSHAddress: server.URL,
+					Username:    "admin",
+					Password:    "admin",
+				}
+
+				client, _ = NewClient(config)
+			})
+
+			AfterEach(func() {
+				teardown()
+			})
+
+			It("can stop an instance", func() {
+				task, err := client.Stop("deployment-foo", "job-foo", "id-foo")
+				Expect(err).Should(BeNil())
+				Expect(task.State).Should(Equal("done"))
+			})
+		})
+
+		Describe("Test stop instance no converge", func() {
+			BeforeEach(func() {
+				setupMockRoutes([]MockRoute{
+					{"PUT", "/deployments/deployment-foo/instance_groups/job-foo/id-foo/actions/stopped", "", server.URL + "/tasks/3"},
+					{"GET", "/tasks/3", task3, ""},
+					{"GET", "/tasks/3", task3, ""},
+				}, "basic")
+
+				config := &Config{
+					BOSHAddress: server.URL,
+					Username:    "admin",
+					Password:    "admin",
+				}
+
+				client, _ = NewClient(config)
+			})
+
+			AfterEach(func() {
+				teardown()
+			})
+
+			It("can stop an instance", func() {
+				task, err := client.StopNoConverge("deployment-foo", "job-foo", "id-foo")
+				Expect(err).Should(BeNil())
+				Expect(task.State).Should(Equal("done"))
 			})
 		})
 
