@@ -23,11 +23,15 @@ type MockRoute struct {
 	Redirect string
 }
 
-func setup(mock MockRoute, authType string) {
-	setupMultiple([]MockRoute{mock}, authType)
+func setup(authType string) {
+	setupMockRoute(MockRoute{}, authType)
 }
 
-func setupMultiple(mockEndpoints []MockRoute, authType string) {
+func setupMockRoute(mock MockRoute, authType string) {
+	setupMockRoutes([]MockRoute{mock}, authType)
+}
+
+func setupMockRoutes(mockEndpoints []MockRoute, authType string) {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
 	fakeUAAServer = FakeUAAServer()
