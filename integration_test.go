@@ -53,6 +53,24 @@ func TestIntegration(t *testing.T) {
 	task, err = client.WaitUntilDone(task, time.Minute*5)
 	g.Expect(err).NotTo(HaveOccurred())
 	g.Expect(task.State).Should(Equal("done"))
+
+	vms, err := client.GetDeploymentVMs("nginx")
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(vms).To(HaveLen(1))
+
+	task, err = client.Stop("nginx", vms[0].JobName, vms[0].ID)
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(task.State).Should(Equal("queued"))
+	task, err = client.WaitUntilDone(task, time.Minute)
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(task.State).Should(Equal("done"))
+
+	task, err = client.Start("nginx", "nginx", vms[0].ID)
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(task.State).Should(Equal("queued"))
+	task, err = client.WaitUntilDone(task, time.Minute)
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(task.State).Should(Equal("done"))
 }
 
 const cloudConfig = `azs:

@@ -275,15 +275,16 @@ var _ = Describe("Api", func() {
 			})
 
 			It("can stop an instance", func() {
-				err := client.Stop("deployment-foo", "job-foo", "id-foo")
+				task, err := client.Stop("deployment-foo", "job-foo", "id-foo")
 				Expect(err).Should(BeNil())
+				Expect(task.State).Should(Equal("done"))
 			})
 		})
 
 		Describe("Test stop instance no converge", func() {
 			BeforeEach(func() {
 				setupMultiple([]MockRoute{
-					{"PUT", "/deployments/deployment-foo/instance_groups/job-foo/id-foo/actions/stop", "", server.URL + "/tasks/3"},
+					{"PUT", "/deployments/deployment-foo/instance_groups/job-foo/id-foo/actions/stopped", "", server.URL + "/tasks/3"},
 					{"GET", "/tasks/3", task3, ""},
 					{"GET", "/tasks/3", task3, ""},
 				}, "basic")
@@ -302,8 +303,9 @@ var _ = Describe("Api", func() {
 			})
 
 			It("can stop an instance", func() {
-				err := client.StopNoConverge("deployment-foo", "job-foo", "id-foo")
+				task, err := client.StopNoConverge("deployment-foo", "job-foo", "id-foo")
 				Expect(err).Should(BeNil())
+				Expect(task.State).Should(Equal("done"))
 			})
 		})
 

@@ -463,66 +463,51 @@ func (c *Client) Cleanup(removeAll bool) (Task, error) {
 	return task, err
 }
 
-func (c *Client) Restart(deployment, instance string) error {
-	return nil
+func (c *Client) Restart(deployment, jobName, instanceID string) (Task, error) {
+	return c.vmAction("restart", deployment, jobName, instanceID, true)
 }
 
-func (c *Client) Stop(deployment, jobName, vmID string) error {
-	// /deployments/cf-f9cc327448912298c6ef/jobs/router/3fc7759a-c453-448c-97b6-844c85029f02?state=stopped
-	return c.doStop(jobName, vmID, fmt.Sprintf("/deployments/%s/jobs/%s/%s?state=stopped", deployment, jobName, vmID))
+func (c *Client) RestartNoConverge(deployment, jobName, instanceID string) (Task, error) {
+	return c.vmAction("restart", deployment, jobName, instanceID, false)
 }
 
-func (c *Client) StopNoConverge(deployment, jobName, vmID string) error {
-	// /deployments/cf-f9cc327448912298c6ef/instance_groups/router/3fc7759a-c453-448c-97b6-844c85029f02/actions/stop
-	return c.doStop(jobName, vmID, fmt.Sprintf("/deployments/%s/instance_groups/%s/%s/actions/stop", deployment, jobName, vmID))
+func (c *Client) Stop(deployment, jobName, instanceID string) (Task, error) {
+	return c.vmAction("stopped", deployment, jobName, instanceID, true)
 }
 
-func (c *Client) Start(deployment, instanceName string) error {
-	return nil
+func (c *Client) StopNoConverge(deployment, jobName, instanceID string) (Task, error) {
+	return c.vmAction("stopped", deployment, jobName, instanceID, false)
 }
 
-func (c *Client) doStop(jobName, vmID, stopPath string) error {
-	r := c.NewRequest("PUT", stopPath)
-	resp, err := c.DoRequest(r)
+func (c *Client) Start(deployment, jobName, instanceID string) (Task, error) {
+	return c.vmAction("started", deployment, jobName, instanceID, true)
+}
 
-	if err != nil {
-		return fmt.Errorf("error creating VM stop task: %w", err)
+func (c *Client) StartNoConverge(deployment, jobName, instanceID string) (Task, error) {
+	return c.vmAction("started", deployment, jobName, instanceID, false)
+}
+
+func (c *Client) vmAction(action, deployment, jobName, instanceID string, converge bool) (Task, error) {
+	var p string
+	if converge {
+		p = fmt.Sprintf("/deployments/%s/jobs/%s/%s?state=%s",
+			deployment, jobName, instanceID, action)
+	} else {
+		p = fmt.Sprintf("/deployments/%s/instance_groups/%s/%s/actions/%s",
+			deployment, jobName, instanceID, action)
 	}
-	defer func() { _ = resp.Body.Close() }()
+	return c.executeVMAction(action, p)
+}
 
-	resBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("error reading VM stop task response: %w", err)
-	}
-
+func (c *Client) executeVMAction(action, actionPath string) (Task, error) {
 	var task Task
-	err = json.Unmarshal(resBody, &task)
+	r := c.NewRequest("PUT", actionPath)
+	r.header["Content-Type"] = "text/yaml"
+	err := c.DoRequestAndUnmarshal(r, &task)
 	if err != nil {
-		return fmt.Errorf("error unmarshalling VM stop task response: %w", err)
+		return Task{}, fmt.Errorf("error creating VM %s task: %w", action, err)
 	}
-
-	// TODO: extract this retry somewhere
-	// TODO: 10m enough? Too much?
-	const maxTries = 600 // 10m
-	for i := 0; i <= maxTries; i++ {
-		if i == maxTries {
-			return fmt.Errorf("timed out getting VM stop task results after %d tries", maxRetries)
-		}
-
-		taskStatus, err := c.GetTask(task.ID)
-		if err != nil {
-			log.Printf("Error getting task %v, retrying...", err)
-		}
-		if taskStatus.State == "done" {
-			break
-		}
-		if taskStatus.State == "error" {
-			return fmt.Errorf("error occurred stopping instance %s/%s", jobName, vmID)
-		}
-		time.Sleep(time.Second)
-	}
-
-	return nil
+	return task, nil
 }
 
 func (c *Client) WaitUntilDone(task Task, timeout time.Duration) (Task, error) {
