@@ -60,9 +60,20 @@ func main() {
 
 ##Development
 
-Tests are currently all local and do not run against bosh or bosh-lite. All the tests can be run using:
+Some test are unit tests and run completely in memory without bosh while the integration tests require a local
+bosh-lite installation. Ideally you would run this before submitting a PR. All the unit and integration tests can be run using:
+```shell
+$ make test-all
+```
+
+Unit tests are fast in-memory tests and do not run against bosh-lite. All the unit tests can be run using:
 ```shell
 $ make test
+```
+
+Integration tests in `integration_test.go` run against [bosh-lite](https://bosh.io/docs/bosh-lite/) and can be run using:
+```shell
+$ BOSH_CLIENT_SECRET='myadminsecret' make test-integration
 ```
 
 Before submitting a PR make sure all the tests pass, the code is properly formatted and linted:
