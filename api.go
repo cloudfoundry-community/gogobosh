@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/url"
 	"strconv"
 	"strings"
@@ -204,7 +204,7 @@ func (c *Client) GetTaskOutput(id int, typ string) ([]string, error) {
 	}
 	defer func() { _ = res.Body.Close() }()
 
-	b, err := ioutil.ReadAll(res.Body)
+	b, err := io.ReadAll(res.Body)
 	if err != nil {
 		return []string{}, fmt.Errorf("error reading task output response: %w", err)
 	}
