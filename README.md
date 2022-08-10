@@ -18,6 +18,9 @@ The following client functions are available, as a subset of the full BOSH Direc
 * client.GetTasks()
 * client.GetTask(123)
 * client.GetTaskResult(123)
+* client.Start("deployment", "job", "instance-id")
+* client.Stop("deployment", "job", "instance-id")
+* client.Restart("deployment", "job", "instance-id")
 
 ## Install
 
