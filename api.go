@@ -5,14 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
 )
-
-const maxRetries = 360 // equates to 5m with 1s sleep
 
 // GetStemcells from given BOSH
 func (c *Client) GetStemcells() ([]Stemcell, error) {
@@ -202,29 +199,17 @@ func (c *Client) DeleteDeployment(name string) (Task, error) {
 	return task, nil
 }
 
-// CreateDeployment from given BOSH
+// CreateDeployment deploys the given deployment manifest
 func (c *Client) CreateDeployment(manifest string) (Task, error) {
 	r := c.NewRequest("POST", "/deployments")
 	buffer := bytes.NewBufferString(manifest)
 	r.body = buffer
 	r.header["Content-Type"] = "text/yaml"
 
-	resp, err := c.DoRequest(r)
-
-	if err != nil {
-		return Task{}, fmt.Errorf("error creating deployment: %w", err)
-	}
-	defer func() { _ = resp.Body.Close() }()
-
-	resBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return Task{}, fmt.Errorf("error reading create deployment response: %w", err)
-	}
-
 	var task Task
-	err = json.Unmarshal(resBody, &task)
+	err := c.DoRequestAndUnmarshal(r, &task)
 	if err != nil {
-		return Task{}, fmt.Errorf("error unmarshalling create deployment response: %w", err)
+		return Task{}, fmt.Errorf("error requesting create deployment task: %w", err)
 	}
 	return task, nil
 }
@@ -232,36 +217,15 @@ func (c *Client) CreateDeployment(manifest string) (Task, error) {
 // GetDeploymentVMs from given BOSH
 func (c *Client) GetDeploymentVMs(name string) ([]VM, error) {
 	r := c.NewRequest("GET", "/deployments/"+name+"/vms?format=full")
-	resp, err := c.DoRequest(r)
-
+	var task Task
+	err := c.DoRequestAndUnmarshal(r, &task)
 	if err != nil {
 		return []VM{}, fmt.Errorf("error requesting deployment VMs task: %w", err)
 	}
-	defer func() { _ = resp.Body.Close() }()
 
-	resBody, err := ioutil.ReadAll(resp.Body)
+	task, err = c.WaitUntilDone(task, time.Minute*5)
 	if err != nil {
-		return []VM{}, fmt.Errorf("error reading deployment VMs task response: %w", err)
-	}
-
-	var task Task
-	err = json.Unmarshal(resBody, &task)
-	if err != nil {
-		return []VM{}, fmt.Errorf("error unmarshalling deployment VMs task response: %w", err)
-	}
-	for i := 0; i <= maxRetries; i++ {
-		if i == maxRetries {
-			return []VM{}, fmt.Errorf("timed out getting deployment VMs task results after %d tries", maxRetries)
-		}
-
-		taskStatus, err := c.GetTask(task.ID)
-		if err != nil {
-			log.Printf("Error getting task %v, retrying...", err)
-		}
-		if taskStatus.State == "done" {
-			break
-		}
-		time.Sleep(time.Second)
+		return []VM{}, fmt.Errorf("error waiting for deployment VM task to complete: %w", err)
 	}
 
 	var vms []VM
@@ -523,7 +487,11 @@ func (c *Client) WaitUntilDone(task Task, timeout time.Duration) (Task, error) {
 		for range ticker.C {
 			curTask, err := c.GetTask(taskID)
 			if err != nil {
-				log.Printf("Failed getting task %d status, retrying: %s", taskID, err)
+				doneCh <- Result{
+					Task:  Task{},
+					Error: fmt.Errorf("error getting task %d status: %w", curTask.ID, err),
+				}
+				return
 			}
 			switch curTask.State {
 			case "done":
