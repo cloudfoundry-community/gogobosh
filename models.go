@@ -24,6 +24,7 @@ type Stemcell struct {
 	OperatingSystem string `json:"operating_system"`
 	Version         string `json:"version"`
 	CID             string `json:"cid"`
+	CPI             string `json:"cpi"`
 	Deployments     []struct {
 		Name string `json:"name"`
 	} `json:"deployments"`
@@ -35,7 +36,7 @@ type Release struct {
 	ReleaseVersions []ReleaseVersion `json:"release_versions"`
 }
 
-//ReleaseVersion struct
+// ReleaseVersion struct
 type ReleaseVersion struct {
 	Version            string   `json:"version"`
 	CommitHash         string   `json:"commit_hash"`
