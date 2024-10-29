@@ -303,38 +303,38 @@ func (c *Client) Cleanup(removeAll bool) (Task, error) {
 	return task, nil
 }
 
-func (c *Client) Restart(deployment, jobName, instanceID string) (Task, error) {
-	return c.vmAction("restart", deployment, jobName, instanceID, true)
+func (c *Client) Restart(deployment, instanceGroup, instanceID string) (Task, error) {
+	return c.vmAction("restart", deployment, instanceGroup, instanceID, true)
 }
 
-func (c *Client) RestartNoConverge(deployment, jobName, instanceID string) (Task, error) {
-	return c.vmAction("restart", deployment, jobName, instanceID, false)
+func (c *Client) RestartNoConverge(deployment, instanceGroup, instanceID string) (Task, error) {
+	return c.vmAction("restart", deployment, instanceGroup, instanceID, false)
 }
 
-func (c *Client) Stop(deployment, jobName, instanceID string) (Task, error) {
-	return c.vmAction("stopped", deployment, jobName, instanceID, true)
+func (c *Client) Stop(deployment, instanceGroup, instanceID string) (Task, error) {
+	return c.vmAction("stopped", deployment, instanceGroup, instanceID, true)
 }
 
-func (c *Client) StopNoConverge(deployment, jobName, instanceID string) (Task, error) {
-	return c.vmAction("stopped", deployment, jobName, instanceID, false)
+func (c *Client) StopNoConverge(deployment, instanceGroup, instanceID string) (Task, error) {
+	return c.vmAction("stopped", deployment, instanceGroup, instanceID, false)
 }
 
-func (c *Client) Start(deployment, jobName, instanceID string) (Task, error) {
-	return c.vmAction("started", deployment, jobName, instanceID, true)
+func (c *Client) Start(deployment, instanceGroup, instanceID string) (Task, error) {
+	return c.vmAction("started", deployment, instanceGroup, instanceID, true)
 }
 
-func (c *Client) StartNoConverge(deployment, jobName, instanceID string) (Task, error) {
-	return c.vmAction("started", deployment, jobName, instanceID, false)
+func (c *Client) StartNoConverge(deployment, instanceGroup, instanceID string) (Task, error) {
+	return c.vmAction("started", deployment, instanceGroup, instanceID, false)
 }
 
-func (c *Client) vmAction(action, deployment, jobName, instanceID string, converge bool) (Task, error) {
+func (c *Client) vmAction(action, deployment, instanceGroup, instanceID string, converge bool) (Task, error) {
 	var p string
 	if converge {
 		p = fmt.Sprintf("/deployments/%s/jobs/%s/%s?state=%s",
-			deployment, jobName, instanceID, action)
+			deployment, instanceGroup, instanceID, action)
 	} else {
 		p = fmt.Sprintf("/deployments/%s/instance_groups/%s/%s/actions/%s",
-			deployment, jobName, instanceID, action)
+			deployment, instanceGroup, instanceID, action)
 	}
 	return c.executeVMAction(action, p)
 }

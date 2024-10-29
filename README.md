@@ -13,14 +13,14 @@ The following client functions are available, as a subset of the full BOSH Direc
 * client.GetStemcells()
 * client.GetReleases()
 * client.GetDeployments()
-* client.GetDeployment("cf-warden")
-* client.GetDeploymentVMs("cf-warden")
+* client.GetDeployment("cf")
+* client.GetDeploymentVMs("cf")
 * client.GetTasks()
 * client.GetTask(123)
 * client.GetTaskResult(123)
-* client.Start("deployment", "job", "instance-id")
-* client.Stop("deployment", "job", "instance-id")
-* client.Restart("deployment", "job", "instance-id")
+* client.Start("cf", "diego_cell", "b1a2e350-0405-41d8-89f0-e257c78b26ae")
+* client.Stop("cf", "diego_cell", "b1a2e350-0405-41d8-89f0-e257c78b26ae")
+* client.Restart("cf", "diego_cell", "b1a2e350-0405-41d8-89f0-e257c78b26ae")
 
 ## Install
 
