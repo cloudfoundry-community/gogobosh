@@ -11,13 +11,42 @@ import (
 	"time"
 )
 
-func TestIntegration(t *testing.T) {
+func TestIntegrationBOSHAllProxy(t *testing.T) {
 	g := NewGomegaWithT(t)
+
+	boshAllProxy := os.Getenv("BOSH_ALL_PROXY")
+	boshClientSecret := os.Getenv("BOSH_CLIENT_SECRET")
+	if boshClientSecret == "" || boshAllProxy == "" {
+		t.Skip("BOSH_ALL_PROXY test requires BOSH_ALL_PROXY and BOSH_CLIENT_SECRET env vars to run")
+	}
 
 	config := &Config{
 		BOSHAddress:       "https://192.168.56.6:25555",
-		Username:          "admin",
-		Password:          os.Getenv("BOSH_CLIENT_SECRET"),
+		ClientID:          "admin",
+		ClientSecret:      boshClientSecret,
+		SkipSslValidation: true,
+	}
+	client, err := NewClient(config)
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(client).NotTo(BeNil())
+
+	info, err := client.GetInfo()
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(info.UUID).ShouldNot(BeEmpty())
+}
+
+func TestIntegration(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	boshClientSecret := os.Getenv("BOSH_CLIENT_SECRET")
+	if boshClientSecret == "" {
+		t.Skip("Integration test requires BOSH_CLIENT_SECRET env var to run")
+	}
+
+	config := &Config{
+		BOSHAddress:       "https://192.168.56.6:25555",
+		ClientID:          "admin",
+		ClientSecret:      boshClientSecret,
 		SkipSslValidation: true,
 	}
 	client, err := NewClient(config)

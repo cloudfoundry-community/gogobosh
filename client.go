@@ -11,18 +11,19 @@ import (
 	"strings"
 	"time"
 
+	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-//Client used to communicate with BOSH
+// Client used to communicate with BOSH
 type Client struct {
 	config   Config
 	Endpoint Endpoint
 }
 
-//Config is used to configure the creation of a client
+// Config is used to configure the creation of a client
 type Config struct {
 	BOSHAddress       string
 	Username          string
@@ -50,10 +51,10 @@ type request struct {
 	obj    interface{}
 }
 
-//DefaultConfig configuration for client
+// DefaultConfig configuration for client
 func DefaultConfig() *Config {
 	return &Config{
-		BOSHAddress:       "https://192.168.50.4:25555",
+		BOSHAddress:       "https://192.168.50.4:25555", // bosh-lite default IP:PORT
 		Username:          "admin",
 		Password:          "admin",
 		HttpClient:        http.DefaultClient,
@@ -84,21 +85,15 @@ func NewClient(config *Config) (*Client, error) {
 		config.Password = defConfig.Password
 	}
 
-	//Save the configured HTTP Client timeout for later
+	// Save the configured HTTP Client timeout for later
 	var timeout time.Duration
 	if config.HttpClient != nil {
 		timeout = config.HttpClient.Timeout
 	}
 
+	// Skip TLS cert validation and respect BOSH_ALL_PROXY env var
+	config.HttpClient = boshhttp.CreateDefaultClientInsecureSkipVerify()
 	endpoint := &Endpoint{}
-	config.HttpClient = &http.Client{
-		Timeout: timeout,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: config.SkipSslValidation,
-			},
-		},
-	}
 
 	authType, err := getAuthType(config.BOSHAddress, config.HttpClient)
 	if err != nil {
